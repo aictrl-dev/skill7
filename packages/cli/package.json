@@ -1,10 +1,19 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "version": "1.2.15",
+  "version": "0.1.0",
   "name": "@skill7/cli",
+  "description": "Headless execution engine for AI agent skills",
   "type": "module",
   "license": "MIT",
-  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://skill7.ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aictrl-dev/skill7"
+  },
+  "private": false,
   "scripts": {
     "typecheck": "tsgo --noEmit",
     "test": "bun test --timeout 30000",

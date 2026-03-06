@@ -1,9 +1,18 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@skill7-ai/sdk",
-  "version": "1.2.15",
+  "version": "0.1.0",
+  "description": "Official SDK for the Skill7 Headless AI Engine",
   "type": "module",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://skill7.ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aictrl-dev/skill7"
+  },
   "scripts": {
     "typecheck": "tsgo --noEmit",
     "build": "bun ./script/build.ts"
