@@ -59,6 +59,7 @@ console.log(`Loaded ${migrations.length} migrations`)
 const singleFlag = process.argv.includes("--single") || process.env.AICTRL_BUILD_SINGLE === "true"
 const baselineFlag = process.argv.includes("--baseline")
 const skipInstall = process.argv.includes("--skip-install")
+const liteFlag = process.argv.includes("--lite")
 
 const allTargets: {
   os: string
@@ -155,6 +156,7 @@ for (const item of targets) {
     item.arch,
     item.avx2 === false ? "baseline" : undefined,
     item.abi === undefined ? undefined : item.abi,
+    liteFlag ? "lite" : undefined,
   ]
     .filter(Boolean)
     .join("-")
@@ -164,19 +166,19 @@ for (const item of targets) {
   await Bun.build({
     conditions: ["browser"],
     tsconfig: "./tsconfig.json",
-    plugins: [solidPlugin],
+    plugins: liteFlag ? [] : [solidPlugin],
     sourcemap: "external",
     compile: {
       autoloadBunfig: false,
       autoloadDotenv: false,
       autoloadTsconfig: true,
       autoloadPackageJson: true,
-      target: name.replace(pkg.name, "bun") as any,
+      target: name.replace("-lite", "").replace(pkg.name, "bun") as any,
       outfile: `dist/${name}/bin/aictrl`,
       execArgv: [`--user-agent=aictrl/${Script.version}`, "--use-system-ca", "--"],
       windows: {},
     },
-    entrypoints: ["./src/index.ts"],
+    entrypoints: [liteFlag ? "./src/headless.ts" : "./src/index.ts"],
     define: {
       AICTRL_VERSION: `'${Script.version}'`,
       AICTRL_MIGRATIONS: JSON.stringify(migrations),
