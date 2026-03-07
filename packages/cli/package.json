@@ -83,7 +83,6 @@
     "@ai-sdk/vercel": "1.0.33",
     "@ai-sdk/xai": "2.0.51",
     "@aictrl/plugin": "workspace:*",
-    "@aictrl/script": "workspace:*",
     "@aictrl/sdk": "workspace:*",
     "@aictrl/util": "workspace:*",
     "@aws-sdk/credential-providers": "3.993.0",
