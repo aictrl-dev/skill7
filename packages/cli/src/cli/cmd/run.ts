@@ -12,6 +12,11 @@ import type { Message, ToolPart } from "@aictrl/sdk/v2"
 import { Provider } from "../../provider/provider"
 import { Agent } from "../../agent/agent"
 import { PermissionNext } from "../../permission/next"
+import { Session } from "../../session"
+import { SessionPrompt } from "../../session/prompt"
+import { Config } from "../../config/config"
+import { GlobalBus } from "../../bus/global"
+import { Instance } from "../../project/instance"
 import { Tool } from "../../tool/tool"
 import { GlobTool } from "../../tool/glob"
 import { GrepTool } from "../../tool/grep"
@@ -595,7 +600,7 @@ export const RunCommand = cmd({
                   `permission requested: ${permission.permission} (${permission.patterns.join(", ")}); auto-rejecting`,
               )
             }
-            await sdk.permission.reply({
+            await PermissionNext.reply({
               requestID: permission.id,
               reply: "reject",
             })
@@ -683,7 +688,123 @@ export const RunCommand = cmd({
     await bootstrap(process.cwd(), async () => {
       const fetchFn = (async (input: RequestInfo | URL, init?: RequestInit) => {
         const request = new Request(input, init)
-      }) as unknown as typeof globalThis.fetch
+        const url = new URL(request.url)
+        const pathname = url.pathname
+        const method = request.method
+
+        // SSE event stream
+        if (method === "GET" && pathname === "/event") {
+          const stream = new ReadableStream({
+            start(controller) {
+              const encoder = new TextEncoder()
+              const handler = (event: { payload: any }) => {
+                const data = JSON.stringify(event.payload)
+                controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+              }
+              GlobalBus.on("event", handler)
+              request.signal.addEventListener("abort", () => {
+                GlobalBus.off("event", handler)
+                try {
+                  controller.close()
+                } catch {
+                  // already closed
+                }
+              })
+            },
+          })
+          return new Response(stream, {
+            status: 200,
+            headers: {
+              "Content-Type": "text/event-stream",
+              "Cache-Control": "no-cache",
+              Connection: "keep-alive",
+            },
+          })
+        }
+
+        // GET /config
+        if (method === "GET" && pathname === "/config") {
+          const cfg = await Config.get()
+          return Response.json(cfg)
+        }
+
+        // GET /session — list sessions
+        if (method === "GET" && pathname === "/session") {
+          const sessions = [...Session.list()]
+          return Response.json(sessions)
+        }
+
+        // POST /session — create session
+        if (method === "POST" && pathname === "/session") {
+          const body = await request.json()
+          const session = await Session.createNext({
+            title: body.title,
+            permission: body.permission,
+            directory: Instance.directory,
+          })
+          return Response.json(session)
+        }
+
+        // POST /session/:id/fork
+        const forkMatch = pathname.match(/^\/session\/([^/]+)\/fork$/)
+        if (method === "POST" && forkMatch) {
+          const body = await request.json().catch(() => ({}))
+          const session = await Session.fork({
+            sessionID: forkMatch[1],
+            messageID: body.messageID,
+          })
+          return Response.json(session)
+        }
+
+        // POST /session/:id/share
+        const shareMatch = pathname.match(/^\/session\/([^/]+)\/share$/)
+        if (method === "POST" && shareMatch) {
+          const share = await Session.share(shareMatch[1])
+          return Response.json({ share })
+        }
+
+        // POST /session/:id/message — prompt
+        const messageMatch = pathname.match(/^\/session\/([^/]+)\/message$/)
+        if (method === "POST" && messageMatch) {
+          const body = await request.json()
+          SessionPrompt.prompt({
+            sessionID: messageMatch[1],
+            parts: body.parts,
+            agent: body.agent,
+            model: body.model,
+            variant: body.variant,
+          }).catch(() => {})
+          return Response.json({ ok: true })
+        }
+
+        // POST /session/:id/command
+        const commandMatch = pathname.match(/^\/session\/([^/]+)\/command$/)
+        if (method === "POST" && commandMatch) {
+          const body = await request.json()
+          SessionPrompt.command({
+            sessionID: commandMatch[1],
+            command: body.command,
+            arguments: body.arguments ?? "",
+            agent: body.agent,
+            model: body.model,
+            variant: body.variant,
+          }).catch(() => {})
+          return Response.json({ ok: true })
+        }
+
+        // POST /session/:id/permissions/:permissionID
+        const permMatch = pathname.match(/^\/session\/([^/]+)\/permissions\/([^/]+)$/)
+        if (method === "POST" && permMatch) {
+          const body = await request.json()
+          await PermissionNext.reply({
+            requestID: permMatch[2],
+            reply: body.response ?? "reject",
+          })
+          return Response.json(true)
+        }
+
+        return new Response("Not Found", { status: 404 })
+      }) as typeof globalThis.fetch
       const sdk = createAictrlClient({ baseUrl: "http://aictrl.internal", fetch: fetchFn })
       await execute(sdk)
     })
