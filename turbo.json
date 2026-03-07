@@ -10,13 +10,8 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
     },
-    "aictrl#test": {
-      "dependsOn": ["^build"],
-      "outputs": []
-    },
-    "@aictrl-ai/app#test": {
-      "dependsOn": ["^build"],
-      "outputs": []
+    "test": {
+      "dependsOn": ["^build"]
     }
   }
 }
