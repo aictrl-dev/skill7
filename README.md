@@ -1,8 +1,8 @@
-# Aictrl Engine
+# Aictrl CLI
 
 The Lightweight Headless Runtime for AI Agent Skills.
 
-Aictrl is a 100% headless, server-side execution harness designed for autonomous agentic workflows. It provides a secure, modular environment to run, measure, and scale agent skills without the bloat of a desktop or terminal UI.
+Aictrl CLI is a 100% headless, server-side execution harness designed for autonomous agentic workflows. It provides a secure, modular environment to run, measure, and scale agent skills without the bloat of a desktop or terminal UI.
 
 ## Key Features
 
@@ -24,12 +24,12 @@ npm i -g @aictrl/cli
 Run a task headlessly:
 
 ```bash
-s7 run "analyze the security of this repository"
+aictrl run "analyze the security of this repository"
 ```
 
 ## Attribution
 
-Aictrl is based on the [Aictrl](https://aictrl.ai) project and is licensed under the MIT License.
+Aictrl is a fork of the [OpenCode](https://opencode.ai) project by [anomalyco](https://github.com/anomalyco/opencode) and is licensed under the MIT License.
 
 ---
-© 2026 [aictrl.ai](https://aictrl.ai)
+© 2026 [aictrl.dev](https://aictrl.dev)
