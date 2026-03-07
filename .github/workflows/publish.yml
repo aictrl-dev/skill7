@@ -30,19 +30,19 @@ jobs:
 
       - name: Publish @aictrl/util
         working-directory: packages/util
-        run: bun pm pack && npx npm publish *.tgz --access public --provenance
+        run: bun pm pack && npx npm publish *.tgz --access public --provenance || true
 
       - name: Publish @aictrl/plugin
         working-directory: packages/plugin
-        run: bun pm pack && npx npm publish *.tgz --access public --provenance
+        run: bun pm pack && npx npm publish *.tgz --access public --provenance || true
 
       - name: Publish @aictrl/sdk
         working-directory: packages/sdk
-        run: bun pm pack && npx npm publish *.tgz --access public --provenance
+        run: bun pm pack && npx npm publish *.tgz --access public --provenance || true
 
       - name: Publish @aictrl/cli-linux-x64
         working-directory: packages/cli/dist/@aictrl/cli-linux-x64
-        run: npx npm publish --access public --provenance
+        run: npx npm publish --access public --provenance || true
 
       - name: Publish @aictrl/cli
         working-directory: packages/cli
