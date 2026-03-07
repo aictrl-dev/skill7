@@ -686,6 +686,7 @@ export const RunCommand = cmd({
     }
 
     await bootstrap(process.cwd(), async () => {
+      const originalFetch = globalThis.fetch
       const fetchFn = (async (input: RequestInfo | URL, init?: RequestInit) => {
         const request = new Request(input, init)
         const url = new URL(request.url)
@@ -722,6 +723,8 @@ export const RunCommand = cmd({
           })
         }
 
+        const body = await request.json().catch(() => ({})) as Record<string, any>
+
         // GET /config
         if (method === "GET" && pathname === "/config") {
           const cfg = await Config.get()
@@ -736,7 +739,6 @@ export const RunCommand = cmd({
 
         // POST /session — create session
         if (method === "POST" && pathname === "/session") {
-          const body = await request.json()
           const session = await Session.createNext({
             title: body.title,
             permission: body.permission,
@@ -748,7 +750,6 @@ export const RunCommand = cmd({
         // POST /session/:id/fork
         const forkMatch = pathname.match(/^\/session\/([^/]+)\/fork$/)
         if (method === "POST" && forkMatch) {
-          const body = await request.json().catch(() => ({}))
           const session = await Session.fork({
             sessionID: forkMatch[1],
             messageID: body.messageID,
@@ -766,7 +767,6 @@ export const RunCommand = cmd({
         // POST /session/:id/message — prompt
         const messageMatch = pathname.match(/^\/session\/([^/]+)\/message$/)
         if (method === "POST" && messageMatch) {
-          const body = await request.json()
           SessionPrompt.prompt({
             sessionID: messageMatch[1],
             parts: body.parts,
@@ -780,7 +780,6 @@ export const RunCommand = cmd({
         // POST /session/:id/command
         const commandMatch = pathname.match(/^\/session\/([^/]+)\/command$/)
         if (method === "POST" && commandMatch) {
-          const body = await request.json()
           SessionPrompt.command({
             sessionID: commandMatch[1],
             command: body.command,
@@ -795,7 +794,6 @@ export const RunCommand = cmd({
         // POST /session/:id/permissions/:permissionID
         const permMatch = pathname.match(/^\/session\/([^/]+)\/permissions\/([^/]+)$/)
         if (method === "POST" && permMatch) {
-          const body = await request.json()
           await PermissionNext.reply({
             requestID: permMatch[2],
             reply: body.response ?? "reject",
@@ -805,8 +803,14 @@ export const RunCommand = cmd({
 
         return new Response("Not Found", { status: 404 })
       }) as typeof globalThis.fetch
-      const sdk = createAictrlClient({ baseUrl: "http://aictrl.internal", fetch: fetchFn })
-      await execute(sdk)
+      // Override globalThis.fetch so SSE client (which bypasses custom fetch) uses our handler
+      globalThis.fetch = fetchFn
+      try {
+        const sdk = createAictrlClient({ baseUrl: "http://aictrl.internal", fetch: fetchFn })
+        await execute(sdk)
+      } finally {
+        globalThis.fetch = originalFetch
+      }
     })
   },
 })
