@@ -657,7 +657,9 @@ export namespace SessionPrompt {
         for (const skill of allSkills) {
           system.unshift(`AVAILABLE SKILL: ${skill.name}\n\n${skill.content}`)
         }
-      } catch {}
+      } catch (e) {
+        log.warn("failed to auto-load skills", { error: e })
+      }
 
       const format = lastUser.format ?? { type: "text" }
       if (format.type === "json_schema") {
