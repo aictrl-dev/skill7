@@ -19,8 +19,8 @@ const options = {
   },
   "mdns-domain": {
     type: "string" as const,
-    describe: "custom domain name for mDNS service (default: skill7.local)",
-    default: "skill7.local",
+    describe: "custom domain name for mDNS service (default: aictrl.local)",
+    default: "aictrl.local",
   },
   cors: {
     type: "string" as const,

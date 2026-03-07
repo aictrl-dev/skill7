@@ -1,6 +1,6 @@
 # ACP (Agent Client Protocol) Implementation
 
-This directory contains a clean, protocol-compliant implementation of the [Agent Client Protocol](https://agentclientprotocol.com/) for skill7.
+This directory contains a clean, protocol-compliant implementation of the [Agent Client Protocol](https://agentclientprotocol.com/) for aictrl.
 
 ## Architecture
 
@@ -21,7 +21,7 @@ The implementation follows a clean separation of concerns:
 
 - **`session.ts`** - Session state management
   - Creates and tracks ACP sessions
-  - Maps ACP sessions to internal skill7 sessions
+  - Maps ACP sessions to internal aictrl sessions
   - Maintains working directory context
   - Handles MCP server configurations
 
@@ -38,10 +38,10 @@ The implementation follows a clean separation of concerns:
 
 ```bash
 # Start the ACP server in the current directory
-skill7 acp
+aictrl acp
 
 # Start in a specific directory
-skill7 acp --cwd /path/to/project
+aictrl acp --cwd /path/to/project
 ```
 
 ### Question Tool Opt-In
@@ -49,7 +49,7 @@ skill7 acp --cwd /path/to/project
 ACP excludes `QuestionTool` by default.
 
 ```bash
-OPENCODE_ENABLE_QUESTION_TOOL=1 skill7 acp
+OPENCODE_ENABLE_QUESTION_TOOL=1 aictrl acp
 ```
 
 Enable this only for ACP clients that support interactive question prompts.
@@ -69,8 +69,8 @@ Add to your Zed configuration (`~/.config/zed/settings.json`):
 ```json
 {
   "agent_servers": {
-    "Skill7": {
-      "command": "skill7",
+    "Aictrl": {
+      "command": "aictrl",
       "args": ["acp"]
     }
   }
@@ -124,7 +124,7 @@ This implementation follows the ACP specification v1:
 - **Session Persistence**: Save and restore full conversation history
 - **Mode Support**: Implement different operational modes (ask, code, etc.)
 - **Enhanced Permissions**: More sophisticated permission handling
-- **Terminal Integration**: Full terminal support via skill7's bash tool
+- **Terminal Integration**: Full terminal support via aictrl's bash tool
 
 ## Testing
 
@@ -133,7 +133,7 @@ This implementation follows the ACP specification v1:
 bun test test/acp.test.ts
 
 # Test manually with stdio
-echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":1}}' | skill7 acp
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":1}}' | aictrl acp
 ```
 
 ## Design Decisions
@@ -158,9 +158,9 @@ Each component has a single responsibility:
 
 This makes the codebase maintainable and testable.
 
-### Mapping to Skill7
+### Mapping to Aictrl
 
-ACP sessions map cleanly to skill7's internal session model:
+ACP sessions map cleanly to aictrl's internal session model:
 
 - ACP `session/new` → creates internal Session
 - ACP `session/prompt` → uses SessionPrompt.prompt()

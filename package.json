@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "skill7",
+  "name": "aictrl",
   "description": "Headless execution engine for AI agent skills",
   "private": true,
   "type": "module",
@@ -76,12 +76,12 @@
     "@aws-sdk/client-s3": "3.933.0",
     "@aictrl/plugin": "0.1.0",
     "@aictrl/script": "0.1.0",
-    "@aictrl/skill7-sdk": "0.1.0",
+    "@aictrl/sdk": "0.1.0",
     "typescript": "catalog:"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/skill7/engine"
+    "url": "https://github.com/aictrl-dev/skill7"
   },
   "license": "MIT",
   "prettier": {

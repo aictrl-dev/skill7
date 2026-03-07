@@ -20973,13 +20973,13 @@
       }
     }
   },
-  "opencode": {
-    "id": "opencode",
+  "aictrl": {
+    "id": "aictrl",
     "env": ["OPENCODE_API_KEY"],
     "npm": "@ai-sdk/openai-compatible",
-    "api": "https://opencode.ai/zen/v1",
-    "name": "OpenCode Zen",
-    "doc": "https://opencode.ai/docs/zen",
+    "api": "https://aictrl.ai/zen/v1",
+    "name": "Aictrl Zen",
+    "doc": "https://aictrl.ai/docs/zen",
     "models": {
       "glm-4.7": {
         "id": "glm-4.7",

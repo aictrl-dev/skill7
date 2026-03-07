@@ -206,16 +206,16 @@ export namespace LLM {
       maxOutputTokens,
       abortSignal: input.abort,
       headers: {
-        ...(input.model.providerID.startsWith("skill7")
+        ...(input.model.providerID.startsWith("aictrl")
           ? {
-              "x-skill7-project": Instance.project.id,
-              "x-skill7-session": input.sessionID,
-              "x-skill7-request": input.user.id,
-              "x-skill7-client": Flag.OPENCODE_CLIENT,
+              "x-aictrl-project": Instance.project.id,
+              "x-aictrl-session": input.sessionID,
+              "x-aictrl-request": input.user.id,
+              "x-aictrl-client": Flag.OPENCODE_CLIENT,
             }
           : input.model.providerID !== "anthropic"
             ? {
-                "User-Agent": `skill7/${Installation.VERSION}`,
+                "User-Agent": `aictrl/${Installation.VERSION}`,
               }
             : undefined),
         ...input.model.headers,

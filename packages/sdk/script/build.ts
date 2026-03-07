@@ -25,7 +25,7 @@ await createClient({
     },
     {
       name: "@hey-api/sdk",
-      instance: "Skill7Client",
+      instance: "AictrlClient",
       exportFromIndex: false,
       auth: false,
       paramsStructure: "flat",

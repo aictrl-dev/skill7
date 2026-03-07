@@ -100,7 +100,7 @@ export namespace Project {
         const gitBinary = Bun.which("git")
 
         // cached id calculation
-        let id = await Filesystem.readText(path.join(dotgit, "skill7"))
+        let id = await Filesystem.readText(path.join(dotgit, "aictrl"))
           .then((x) => x.trim())
           .catch(() => undefined)
 
@@ -138,7 +138,7 @@ export namespace Project {
 
           id = roots[0]
           if (id) {
-            await Filesystem.write(path.join(dotgit, "skill7"), id).catch(() => undefined)
+            await Filesystem.write(path.join(dotgit, "aictrl"), id).catch(() => undefined)
           }
         }
 

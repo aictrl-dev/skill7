@@ -128,13 +128,13 @@ export namespace Provider {
         },
       }
     },
-    async skill7(input) {
+    async aictrl(input) {
       const hasKey = await (async () => {
         const env = Env.all()
         if (input.env.some((item) => env[item])) return true
         if (await Auth.get(input.id)) return true
         const config = await Config.get()
-        if (config.provider?.["skill7"]?.options?.apiKey) return true
+        if (config.provider?.["aictrl"]?.options?.apiKey) return true
         return false
       })()
 
@@ -278,7 +278,7 @@ export namespace Provider {
           }
 
           // Region resolution precedence (highest to lowest):
-          // 1. options.region from skill7.json provider config
+          // 1. options.region from aictrl.json provider config
           // 2. defaultRegion from AWS_REGION environment variable
           // 3. Default "us-east-1" (baked into defaultRegion)
           const region = options?.region ?? defaultRegion
@@ -361,8 +361,8 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            "HTTP-Referer": "https://skill7.ai/",
-            "X-Title": "skill7",
+            "HTTP-Referer": "https://aictrl.ai/",
+            "X-Title": "aictrl",
           },
         },
       }
@@ -372,8 +372,8 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            "http-referer": "https://skill7.ai/",
-            "x-title": "skill7",
+            "http-referer": "https://aictrl.ai/",
+            "x-title": "aictrl",
           },
         },
       }
@@ -458,8 +458,8 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            "HTTP-Referer": "https://skill7.ai/",
-            "X-Title": "skill7",
+            "HTTP-Referer": "https://aictrl.ai/",
+            "X-Title": "aictrl",
           },
         },
       }
@@ -478,7 +478,7 @@ export namespace Provider {
       const providerConfig = config.provider?.["gitlab"]
 
       const aiGatewayHeaders = {
-        "User-Agent": `skill7/${Installation.VERSION} gitlab-ai-provider/${GITLAB_PROVIDER_VERSION} (${os.platform()} ${os.release()}; ${os.arch()})`,
+        "User-Agent": `aictrl/${Installation.VERSION} gitlab-ai-provider/${GITLAB_PROVIDER_VERSION} (${os.platform()} ${os.release()}; ${os.arch()})`,
         ...(providerConfig?.options?.aiGatewayHeaders || {}),
       }
 
@@ -547,7 +547,7 @@ export namespace Provider {
       if (!apiToken) {
         throw new Error(
           "CLOUDFLARE_API_TOKEN (or CF_AIG_TOKEN) is required for Cloudflare AI Gateway. " +
-            "Set it via environment variable or run `skill7 auth cloudflare-ai-gateway`.",
+            "Set it via environment variable or run `aictrl auth cloudflare-ai-gateway`.",
         )
       }
 
@@ -572,7 +572,7 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            "X-Cerebras-3rd-Party-Integration": "skill7",
+            "X-Cerebras-3rd-Party-Integration": "aictrl",
           },
         },
       }
@@ -582,8 +582,8 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            "HTTP-Referer": "https://skill7.ai/",
-            "X-Title": "skill7",
+            "HTTP-Referer": "https://aictrl.ai/",
+            "X-Title": "aictrl",
           },
         },
       }
@@ -1228,7 +1228,7 @@ export namespace Provider {
         "gemini-2.5-flash",
         "gpt-5-nano",
       ]
-      if (providerID.startsWith("skill7")) {
+      if (providerID.startsWith("aictrl")) {
         priority = ["gpt-5-nano"]
       }
       if (providerID.startsWith("github-copilot")) {
@@ -1266,10 +1266,10 @@ export namespace Provider {
       }
     }
 
-    // Check if skill7 provider is available before using it
-    const skill7Provider = await state().then((state) => state.providers["skill7"])
-    if (skill7Provider && skill7Provider.models["gpt-5-nano"]) {
-      return getModel("skill7", "gpt-5-nano")
+    // Check if aictrl provider is available before using it
+    const aictrlProvider = await state().then((state) => state.providers["aictrl"])
+    if (aictrlProvider && aictrlProvider.models["gpt-5-nano"]) {
+      return getModel("aictrl", "gpt-5-nano")
     }
 
     return undefined

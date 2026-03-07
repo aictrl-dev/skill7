@@ -41,7 +41,7 @@ export namespace ProviderError {
 
   function error(providerID: string, error: APICallError) {
     if (providerID.includes("github-copilot") && error.statusCode === 403) {
-      return "Please reauthenticate with the copilot provider to ensure your credentials work properly with Skill7."
+      return "Please reauthenticate with the copilot provider to ensure your credentials work properly with Aictrl."
     }
 
     return error.message
@@ -80,7 +80,7 @@ export namespace ProviderError {
       // provide a human-readable message instead of dumping raw markup
       if (/^\s*<!doctype|^\s*<html/i.test(e.responseBody)) {
         if (e.statusCode === 401) {
-          return "Unauthorized: request was blocked by a gateway or proxy. Your authentication token may be missing or expired — try running `skill7 auth login <your provider URL>` to re-authenticate."
+          return "Unauthorized: request was blocked by a gateway or proxy. Your authentication token may be missing or expired — try running `aictrl auth login <your provider URL>` to re-authenticate."
         }
         if (e.statusCode === 403) {
           return "Forbidden: request was blocked by a gateway or proxy. You may not have permission to access this resource — check your account and provider settings."

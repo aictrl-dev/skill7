@@ -1,7 +1,7 @@
 ---
 description: Translate content for a specified locale while preserving technical terms
 mode: subagent
-model: opencode/gemini-3-pro
+model: aictrl/gemini-3-pro
 ---
 
 You are a professional translator and localization specialist.
@@ -13,7 +13,7 @@ Requirements:
 - Preserve meaning, intent, tone, and formatting (including Markdown/MDX structure).
 - Preserve all technical terms and artifacts exactly: product/company names, API names, identifiers, code, commands/flags, file paths, URLs, versions, error messages, config keys/values, and anything inside inline code or code blocks.
 - Also preserve every term listed in the Do-Not-Translate glossary below.
-- Also apply locale-specific guidance from `.opencode/glossary/<locale>.md` when available (for example, `zh-cn.md`).
+- Also apply locale-specific guidance from `.aictrl/glossary/<locale>.md` when available (for example, `zh-cn.md`).
 - Do not modify fenced code blocks.
 - Output ONLY the translation (no commentary).
 
@@ -35,7 +35,7 @@ Locale guidance does not override code/command preservation rules or the global 
 
 ---
 
-# Do-Not-Translate Terms (OpenCode Docs)
+# Do-Not-Translate Terms (Aictrl Docs)
 
 Generated from: `packages/web/src/content/docs/*.mdx` (default English docs)
 Generated on: 2026-02-10
@@ -68,8 +68,8 @@ Neovim
 Node.js
 npm
 Obsidian
-opencode
-opencode-ai
+aictrl
+aictrl-ai
 Paru
 pnpm
 ripgrep
@@ -152,15 +152,15 @@ OAuth
 Ollama integration docs
 OpenAI's Data Policies
 OpenChamber
-OpenCode
-OpenCode config
-OpenCode Config
-OpenCode TUI with the opencode theme
-OpenCode Web - Active Session
-OpenCode Web - New Session
-OpenCode Web - See Servers
-OpenCode Zen
-OpenCode-Obsidian
+Aictrl
+Aictrl config
+Aictrl Config
+Aictrl TUI with the aictrl theme
+Aictrl Web - Active Session
+Aictrl Web - New Session
+Aictrl Web - See Servers
+Aictrl Zen
+Aictrl-Obsidian
 OpenRouter dashboard
 OpenWork
 OVHcloud panel
@@ -301,7 +301,7 @@ NoeFabris
 OpenAI
 OpenAPI
 OpenChamber
-OpenCode
+Aictrl
 OpenRouter
 OpenTUI
 OpenWork
@@ -325,69 +325,69 @@ xAI
 ZenMux
 ```
 
-## OpenCode CLI commands (as shown in docs)
+## Aictrl CLI commands (as shown in docs)
 
 ```text
-opencode
-opencode [project]
-opencode /path/to/project
-opencode acp
-opencode agent [command]
-opencode agent create
-opencode agent list
-opencode attach [url]
-opencode attach http://10.20.30.40:4096
-opencode attach http://localhost:4096
-opencode auth [command]
-opencode auth list
-opencode auth login
-opencode auth logout
-opencode auth ls
-opencode export [sessionID]
-opencode github [command]
-opencode github install
-opencode github run
-opencode import <file>
-opencode import https://opncd.ai/s/abc123
-opencode import session.json
-opencode mcp [command]
-opencode mcp add
-opencode mcp auth [name]
-opencode mcp auth list
-opencode mcp auth ls
-opencode mcp auth my-oauth-server
-opencode mcp auth sentry
-opencode mcp debug <name>
-opencode mcp debug my-oauth-server
-opencode mcp list
-opencode mcp logout [name]
-opencode mcp logout my-oauth-server
-opencode mcp ls
-opencode models --refresh
-opencode models [provider]
-opencode models anthropic
-opencode run [message..]
-opencode run Explain the use of context in Go
-opencode serve
-opencode serve --cors http://localhost:5173 --cors https://app.example.com
-opencode serve --hostname 0.0.0.0 --port 4096
-opencode serve [--port <number>] [--hostname <string>] [--cors <origin>]
-opencode session [command]
-opencode session list
-opencode session delete <sessionID>
-opencode stats
-opencode uninstall
-opencode upgrade
-opencode upgrade [target]
-opencode upgrade v0.1.48
-opencode web
-opencode web --cors https://example.com
-opencode web --hostname 0.0.0.0
-opencode web --mdns
-opencode web --mdns --mdns-domain myproject.local
-opencode web --port 4096
-opencode web --port 4096 --hostname 0.0.0.0
-opencode.server.close()
+aictrl
+aictrl [project]
+aictrl /path/to/project
+aictrl acp
+aictrl agent [command]
+aictrl agent create
+aictrl agent list
+aictrl attach [url]
+aictrl attach http://10.20.30.40:4096
+aictrl attach http://localhost:4096
+aictrl auth [command]
+aictrl auth list
+aictrl auth login
+aictrl auth logout
+aictrl auth ls
+aictrl export [sessionID]
+aictrl github [command]
+aictrl github install
+aictrl github run
+aictrl import <file>
+aictrl import https://opncd.ai/s/abc123
+aictrl import session.json
+aictrl mcp [command]
+aictrl mcp add
+aictrl mcp auth [name]
+aictrl mcp auth list
+aictrl mcp auth ls
+aictrl mcp auth my-oauth-server
+aictrl mcp auth sentry
+aictrl mcp debug <name>
+aictrl mcp debug my-oauth-server
+aictrl mcp list
+aictrl mcp logout [name]
+aictrl mcp logout my-oauth-server
+aictrl mcp ls
+aictrl models --refresh
+aictrl models [provider]
+aictrl models anthropic
+aictrl run [message..]
+aictrl run Explain the use of context in Go
+aictrl serve
+aictrl serve --cors http://localhost:5173 --cors https://app.example.com
+aictrl serve --hostname 0.0.0.0 --port 4096
+aictrl serve [--port <number>] [--hostname <string>] [--cors <origin>]
+aictrl session [command]
+aictrl session list
+aictrl session delete <sessionID>
+aictrl stats
+aictrl uninstall
+aictrl upgrade
+aictrl upgrade [target]
+aictrl upgrade v0.1.48
+aictrl web
+aictrl web --cors https://example.com
+aictrl web --hostname 0.0.0.0
+aictrl web --mdns
+aictrl web --mdns --mdns-domain myproject.local
+aictrl web --port 4096
+aictrl web --port 4096 --hostname 0.0.0.0
+aictrl.server.close()
 ```
 
 ## Slash commands and routes
@@ -428,7 +428,7 @@ opencode.server.close()
 /mnt/d/
 /models
 /oc
-/opencode
+/aictrl
 /path
 /project
 /project/current
@@ -636,8 +636,8 @@ XDG_CONFIG_HOME
 ```text
 ../../../config.mjs
 @astrojs/starlight/components
-@opencode-ai/plugin
-@opencode-ai/sdk
+@aictrl-ai/plugin
+@aictrl-ai/sdk
 path
 shescape
 zod
@@ -650,77 +650,77 @@ zod
 @ai-sdk/openai-compatible
 @File#L37-42
 @modelcontextprotocol/server-everything
-@opencode
+@aictrl
 ```
 
 ## GitHub owner/repo slugs referenced in docs
 
 ```text
-24601/opencode-zellij-namer
-angristan/opencode-wakatime
-anomalyco/opencode
-apps/opencode-agent
-athal7/opencode-devcontainers
-awesome-opencode/awesome-opencode
+24601/aictrl-zellij-namer
+angristan/aictrl-wakatime
+anomalyco/aictrl
+apps/aictrl-agent
+athal7/aictrl-devcontainers
+awesome-aictrl/awesome-aictrl
 backnotprop/plannotator
-ben-vargas/ai-sdk-provider-opencode-sdk
+ben-vargas/ai-sdk-provider-aictrl-sdk
 btriapitsyn/openchamber
 BurntSushi/ripgrep
 Cluster444/agentic
-code-yeongyu/oh-my-opencode
-darrenhinde/opencode-agents
-different-ai/opencode-scheduler
+code-yeongyu/oh-my-aictrl
+darrenhinde/aictrl-agents
+different-ai/aictrl-scheduler
 different-ai/openwork
 features/copilot
 folke/tokyonight.nvim
-franlol/opencode-md-table-formatter
+franlol/aictrl-md-table-formatter
 ggml-org/llama.cpp
-ghoulr/opencode-websearch-cited.git
-H2Shami/opencode-helicone-session
+ghoulr/aictrl-websearch-cited.git
+H2Shami/aictrl-helicone-session
 hosenur/portal
 jamesmurdza/daytona
-jenslys/opencode-gemini-auth
-JRedeker/opencode-morph-fast-apply
-JRedeker/opencode-shell-strategy
+jenslys/aictrl-gemini-auth
+JRedeker/aictrl-morph-fast-apply
+JRedeker/aictrl-shell-strategy
 kdcokenny/ocx
-kdcokenny/opencode-background-agents
-kdcokenny/opencode-notify
-kdcokenny/opencode-workspace
-kdcokenny/opencode-worktree
+kdcokenny/aictrl-background-agents
+kdcokenny/aictrl-notify
+kdcokenny/aictrl-workspace
+kdcokenny/aictrl-worktree
 login/device
-mohak34/opencode-notifier
+mohak34/aictrl-notifier
 morhetz/gruvbox
-mtymek/opencode-obsidian
+mtymek/aictrl-obsidian
 NeuralNomadsAI/CodeNomad
-nick-vi/opencode-type-inject
-NickvanDyke/opencode.nvim
-NoeFabris/opencode-antigravity-auth
+nick-vi/aictrl-type-inject
+NickvanDyke/aictrl.nvim
+NoeFabris/aictrl-antigravity-auth
 nordtheme/nord
-numman-ali/opencode-openai-codex-auth
+numman-ali/aictrl-openai-codex-auth
 olimorris/codecompanion.nvim
-panta82/opencode-notificator
+panta82/aictrl-notificator
 rebelot/kanagawa.nvim
 remorses/kimaki
 sainnhe/everforest
-shekohex/opencode-google-antigravity-auth
-shekohex/opencode-pty.git
+shekohex/aictrl-google-antigravity-auth
+shekohex/aictrl-pty.git
 spoons-and-mirrors/subtask2
-sudo-tee/opencode.nvim
-supermemoryai/opencode-supermemory
-Tarquinen/opencode-dynamic-context-pruning
+sudo-tee/aictrl.nvim
+supermemoryai/aictrl-supermemory
+Tarquinen/aictrl-dynamic-context-pruning
 Th3Whit3Wolf/one-nvim
 upstash/context7
 vtemian/micode
 vtemian/octto
 yetone/avante.nvim
-zenobi-us/opencode-plugin-template
-zenobi-us/opencode-skillful
+zenobi-us/aictrl-plugin-template
+zenobi-us/aictrl-skillful
 ```
 
 ## Paths, filenames, globs, and URLs
 
 ```text
-./.opencode/themes/*.json
+./.aictrl/themes/*.json
 ./<project-slug>/storage/
 ./config/#custom-directory
 ./global/storage/
@@ -732,68 +732,68 @@ zenobi-us/opencode-skillful
 .claude/skills/*/SKILL.md
 .claude/skills/<name>/SKILL.md
 .env
-.github/workflows/opencode.yml
+.github/workflows/aictrl.yml
 .gitignore
 .gitlab-ci.yml
 .ignore
 .NET SDK
 .npmrc
 .ocamlformat
-.opencode
-.opencode/
-.opencode/agents/
-.opencode/commands/
-.opencode/commands/test.md
-.opencode/modes/
-.opencode/plans/*.md
-.opencode/plugins/
-.opencode/skills/<name>/SKILL.md
-.opencode/skills/git-release/SKILL.md
-.opencode/tools/
-.well-known/opencode
+.aictrl
+.aictrl/
+.aictrl/agents/
+.aictrl/commands/
+.aictrl/commands/test.md
+.aictrl/modes/
+.aictrl/plans/*.md
+.aictrl/plugins/
+.aictrl/skills/<name>/SKILL.md
+.aictrl/skills/git-release/SKILL.md
+.aictrl/tools/
+.well-known/aictrl
 { type: "raw" \| "patch", content: string }
 {file:path/to/file}
 **/*.js
 %USERPROFILE%/intelephense/license.txt
-%USERPROFILE%\.cache\opencode
-%USERPROFILE%\.config\opencode\opencode.jsonc
-%USERPROFILE%\.config\opencode\plugins
-%USERPROFILE%\.local\share\opencode
-%USERPROFILE%\.local\share\opencode\log
-<project-root>/.opencode/themes/*.json
+%USERPROFILE%\.cache\aictrl
+%USERPROFILE%\.config\aictrl\aictrl.jsonc
+%USERPROFILE%\.config\aictrl\plugins
+%USERPROFILE%\.local\share\aictrl
+%USERPROFILE%\.local\share\aictrl\log
+<project-root>/.aictrl/themes/*.json
 <providerId>/<modelId>
-<your-project>/.opencode/plugins/
+<your-project>/.aictrl/plugins/
 ~
 ~/...
 ~/.agents/skills/*/SKILL.md
 ~/.agents/skills/<name>/SKILL.md
 ~/.aws/credentials
 ~/.bashrc
-~/.cache/opencode
-~/.cache/opencode/node_modules/
+~/.cache/aictrl
+~/.cache/aictrl/node_modules/
 ~/.claude/CLAUDE.md
 ~/.claude/skills/
 ~/.claude/skills/*/SKILL.md
 ~/.claude/skills/<name>/SKILL.md
-~/.config/opencode
-~/.config/opencode/AGENTS.md
-~/.config/opencode/agents/
-~/.config/opencode/commands/
-~/.config/opencode/modes/
-~/.config/opencode/opencode.json
-~/.config/opencode/opencode.jsonc
-~/.config/opencode/plugins/
-~/.config/opencode/skills/*/SKILL.md
-~/.config/opencode/skills/<name>/SKILL.md
-~/.config/opencode/themes/*.json
-~/.config/opencode/tools/
+~/.config/aictrl
+~/.config/aictrl/AGENTS.md
+~/.config/aictrl/agents/
+~/.config/aictrl/commands/
+~/.config/aictrl/modes/
+~/.config/aictrl/aictrl.json
+~/.config/aictrl/aictrl.jsonc
+~/.config/aictrl/plugins/
+~/.config/aictrl/skills/*/SKILL.md
+~/.config/aictrl/skills/<name>/SKILL.md
+~/.config/aictrl/themes/*.json
+~/.config/aictrl/tools/
 ~/.config/zed/settings.json
 ~/.local/share
-~/.local/share/opencode/
-~/.local/share/opencode/auth.json
-~/.local/share/opencode/log/
-~/.local/share/opencode/mcp-auth.json
-~/.local/share/opencode/opencode.jsonc
+~/.local/share/aictrl/
+~/.local/share/aictrl/auth.json
+~/.local/share/aictrl/log/
+~/.local/share/aictrl/mcp-auth.json
+~/.local/share/aictrl/aictrl.jsonc
 ~/.npmrc
 ~/.zshrc
 ~/code/
@@ -803,7 +803,7 @@ zenobi-us/opencode-skillful
 ${config.github}/blob/dev/packages/sdk/js/src/gen/types.gen.ts
 $HOME/intelephense/license.txt
 $HOME/projects/*
-$XDG_CONFIG_HOME/opencode/themes/*.json
+$XDG_CONFIG_HOME/aictrl/themes/*.json
 agent/
 agents/
 build/
@@ -816,11 +816,11 @@ http://localhost:4096
 http://localhost:4096/doc
 https://app.example.com
 https://AZURE_COGNITIVE_SERVICES_RESOURCE_NAME.cognitiveservices.azure.com/
-https://opencode.ai/zen/v1/chat/completions
-https://opencode.ai/zen/v1/messages
-https://opencode.ai/zen/v1/models/gemini-3-flash
-https://opencode.ai/zen/v1/models/gemini-3-pro
-https://opencode.ai/zen/v1/responses
+https://aictrl.ai/zen/v1/chat/completions
+https://aictrl.ai/zen/v1/messages
+https://aictrl.ai/zen/v1/models/gemini-3-flash
+https://aictrl.ai/zen/v1/models/gemini-3-pro
+https://aictrl.ai/zen/v1/responses
 https://RESOURCE_NAME.openai.azure.com/
 laravel/pint
 log/
@@ -828,11 +828,11 @@ model: "anthropic/claude-sonnet-4-5"
 modes/
 node_modules/
 openai/gpt-4.1
-opencode.ai/config.json
-opencode/<model-id>
-opencode/gpt-5.1-codex
-opencode/gpt-5.2-codex
-opencode/kimi-k2
+aictrl.ai/config.json
+aictrl/<model-id>
+aictrl/gpt-5.1-codex
+aictrl/gpt-5.2-codex
+aictrl/kimi-k2
 openrouter/google/gemini-2.5-flash
 opncd.ai/s/<share-id>
 packages/*/AGENTS.md
@@ -841,7 +841,7 @@ project/
 provider_id/model_id
 provider/model
 provider/model-id
-rm -rf ~/.cache/opencode
+rm -rf ~/.cache/aictrl
 skills/
 skills/*/SKILL.md
 src/**/*.ts
@@ -893,8 +893,8 @@ gitlab/duo-chat-haiku-4-5
 lmstudio/google/gemma-3n-e4b
 openai/gpt-4.1
 openai/gpt-5
-opencode/gpt-5.1-codex
-opencode/gpt-5.2-codex
-opencode/kimi-k2
+aictrl/gpt-5.1-codex
+aictrl/gpt-5.2-codex
+aictrl/kimi-k2
 openrouter/google/gemini-2.5-flash
 ```

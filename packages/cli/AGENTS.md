@@ -1,4 +1,4 @@
-# opencode database guide
+# aictrl database guide
 
 ## Database
 

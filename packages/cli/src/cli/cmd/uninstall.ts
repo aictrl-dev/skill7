@@ -24,7 +24,7 @@ interface RemovalTargets {
 
 export const UninstallCommand = {
   command: "uninstall",
-  describe: "uninstall skill7 and remove all related files",
+  describe: "uninstall aictrl and remove all related files",
   builder: (yargs: Argv) =>
     yargs
       .option("keep-config", {
@@ -55,7 +55,7 @@ export const UninstallCommand = {
     UI.empty()
     UI.println(UI.logo("  "))
     UI.empty()
-    prompts.intro("Uninstall Skill7")
+    prompts.intro("Uninstall Aictrl")
 
     const method = await Installation.method()
     prompts.log.info(`Installation method: ${method}`)
@@ -129,13 +129,13 @@ async function showRemovalSummary(targets: RemovalTargets, method: Installation.
 
   if (method !== "curl" && method !== "unknown") {
     const cmds: Record<string, string> = {
-      npm: "npm uninstall -g skill7-ai",
-      pnpm: "pnpm uninstall -g skill7-ai",
-      bun: "bun remove -g skill7-ai",
-      yarn: "yarn global remove skill7-ai",
-      brew: "brew uninstall skill7",
-      choco: "choco uninstall skill7",
-      scoop: "scoop uninstall skill7",
+      npm: "npm uninstall -g aictrl-ai",
+      pnpm: "pnpm uninstall -g aictrl-ai",
+      bun: "bun remove -g aictrl-ai",
+      yarn: "yarn global remove aictrl-ai",
+      brew: "brew uninstall aictrl",
+      choco: "choco uninstall aictrl",
+      scoop: "scoop uninstall aictrl",
     }
     prompts.log.info(`  ✓ Package: ${cmds[method] || method}`)
   }
@@ -180,13 +180,13 @@ async function executeUninstall(method: Installation.Method, targets: RemovalTar
 
   if (method !== "curl" && method !== "unknown") {
     const cmds: Record<string, string[]> = {
-      npm: ["npm", "uninstall", "-g", "skill7-ai"],
-      pnpm: ["pnpm", "uninstall", "-g", "skill7-ai"],
-      bun: ["bun", "remove", "-g", "skill7-ai"],
-      yarn: ["yarn", "global", "remove", "skill7-ai"],
-      brew: ["brew", "uninstall", "skill7"],
-      choco: ["choco", "uninstall", "skill7"],
-      scoop: ["scoop", "uninstall", "skill7"],
+      npm: ["npm", "uninstall", "-g", "aictrl-ai"],
+      pnpm: ["pnpm", "uninstall", "-g", "aictrl-ai"],
+      bun: ["bun", "remove", "-g", "aictrl-ai"],
+      yarn: ["yarn", "global", "remove", "aictrl-ai"],
+      brew: ["brew", "uninstall", "aictrl"],
+      choco: ["choco", "uninstall", "aictrl"],
+      scoop: ["scoop", "uninstall", "aictrl"],
     }
 
     const cmd = cmds[method]
@@ -194,7 +194,7 @@ async function executeUninstall(method: Installation.Method, targets: RemovalTar
       spinner.start(`Running ${cmd.join(" ")}...`)
       const result =
         method === "choco"
-          ? await $`echo Y | choco uninstall skill7 -y -r`.quiet().nothrow()
+          ? await $`echo Y | choco uninstall aictrl -y -r`.quiet().nothrow()
           : await $`${cmd}`.quiet().nothrow()
       if (result.exitCode !== 0) {
         spinner.stop(`Package manager uninstall failed: exit code ${result.exitCode}`, 1)
@@ -218,7 +218,7 @@ async function executeUninstall(method: Installation.Method, targets: RemovalTar
     prompts.log.info(`  rm "${targets.binary}"`)
 
     const binDir = path.dirname(targets.binary)
-    if (binDir.includes(".skill7")) {
+    if (binDir.includes(".aictrl")) {
       prompts.log.info(`  rmdir "${binDir}" 2>/dev/null`)
     }
   }
@@ -232,7 +232,7 @@ async function executeUninstall(method: Installation.Method, targets: RemovalTar
   }
 
   UI.empty()
-  prompts.log.success("Thank you for using Skill7!")
+  prompts.log.success("Thank you for using Aictrl!")
 }
 
 async function getShellConfigFile(): Promise<string | null> {
@@ -269,7 +269,7 @@ async function getShellConfigFile(): Promise<string | null> {
     if (!exists) continue
 
     const content = await Filesystem.readText(file).catch(() => "")
-    if (content.includes("# skill7") || content.includes(".skill7/bin")) {
+    if (content.includes("# aictrl") || content.includes(".aictrl/bin")) {
       return file
     }
   }
@@ -287,21 +287,21 @@ async function cleanShellConfig(file: string) {
   for (const line of lines) {
     const trimmed = line.trim()
 
-    if (trimmed === "# skill7") {
+    if (trimmed === "# aictrl") {
       skip = true
       continue
     }
 
     if (skip) {
       skip = false
-      if (trimmed.includes(".skill7/bin") || trimmed.includes("fish_add_path")) {
+      if (trimmed.includes(".aictrl/bin") || trimmed.includes("fish_add_path")) {
         continue
       }
     }
 
     if (
-      (trimmed.startsWith("export PATH=") && trimmed.includes(".skill7/bin")) ||
-      (trimmed.startsWith("fish_add_path") && trimmed.includes(".skill7"))
+      (trimmed.startsWith("export PATH=") && trimmed.includes(".aictrl/bin")) ||
+      (trimmed.startsWith("fish_add_path") && trimmed.includes(".aictrl"))
     ) {
       continue
     }

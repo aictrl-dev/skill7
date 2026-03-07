@@ -5,7 +5,7 @@ import { type Config } from "./gen/client/types.gen.js"
 import { OpencodeClient } from "./gen/sdk.gen.js"
 export { type Config as OpencodeClientConfig, OpencodeClient }
 
-export function createSkill7Client(config?: Config & { directory?: string }) {
+export function createAictrlClient(config?: Config & { directory?: string }) {
   if (!config?.fetch) {
     const customFetch: any = (req: any) => {
       // @ts-ignore
@@ -21,7 +21,7 @@ export function createSkill7Client(config?: Config & { directory?: string }) {
   if (config?.directory) {
     config.headers = {
       ...config.headers,
-      "x-skill7-directory": encodeURIComponent(config.directory),
+      "x-aictrl-directory": encodeURIComponent(config.directory),
     }
   }
 

@@ -6,7 +6,7 @@ export const GenerateCommand = {
     const specs = {
       openapi: "3.1.1",
       info: {
-        title: "skill7",
+        title: "aictrl",
         version: "1.0.0",
       },
       paths: {},

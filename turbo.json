@@ -10,11 +10,11 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
     },
-    "opencode#test": {
+    "aictrl#test": {
       "dependsOn": ["^build"],
       "outputs": []
     },
-    "@opencode-ai/app#test": {
+    "@aictrl-ai/app#test": {
       "dependsOn": ["^build"],
       "outputs": []
     }

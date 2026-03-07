@@ -54,7 +54,7 @@ export namespace TuiConfig {
     }
 
     for (const dir of unique(directories)) {
-      if (!dir.endsWith(".skill7") && dir !== Flag.OPENCODE_CONFIG_DIR) continue
+      if (!dir.endsWith(".aictrl") && dir !== Flag.OPENCODE_CONFIG_DIR) continue
       for (const file of ConfigPaths.fileInDirectory(dir, "tui")) {
         result = mergeInfo(result, await loadFile(file))
       }
@@ -91,7 +91,7 @@ export namespace TuiConfig {
     if (!data || typeof data !== "object" || Array.isArray(data)) return {}
 
     // Flatten a nested "tui" key so users who wrote `{ "tui": { ... } }` inside tui.json
-    // (mirroring the old skill7.json shape) still get their settings applied.
+    // (mirroring the old aictrl.json shape) still get their settings applied.
     const normalized = (() => {
       const copy = { ...(data as Record<string, unknown>) }
       if (!("tui" in copy)) return copy

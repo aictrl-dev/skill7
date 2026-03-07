@@ -33,7 +33,7 @@ const IS_PREVIEW = CHANNEL !== "latest"
 const VERSION = await (async () => {
   if (env.OPENCODE_VERSION) return env.OPENCODE_VERSION
   if (IS_PREVIEW) return `0.0.0-${CHANNEL}-${new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "")}`
-  const version = await fetch("https://registry.npmjs.org/@aictrl/skill7/latest")
+  const version = await fetch("https://registry.npmjs.org/@aictrl/aictrl/latest")
     .then((res) => {
       if (!res.ok) return "0.0.0"
       return res.json().then((data: any) => data.version)
@@ -46,7 +46,7 @@ const VERSION = await (async () => {
   return `${major}.${minor}.${patch + 1}`
 })()
 
-const bot = ["actions-user", "skill7", "skill7-agent[bot]"]
+const bot = ["actions-user", "aictrl", "aictrl-agent[bot]"]
 const team: string[] = [...bot]
 
 export const Script = {
@@ -66,4 +66,4 @@ export const Script = {
     return team
   },
 }
-console.log(`opencode script`, JSON.stringify(Script, null, 2))
+console.log(`aictrl script`, JSON.stringify(Script, null, 2))

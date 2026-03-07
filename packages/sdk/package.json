@@ -1,17 +1,17 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@aictrl/skill7-sdk",
+  "name": "@aictrl/sdk",
   "version": "0.1.0",
-  "description": "Official SDK for the Skill7 Headless AI Engine",
+  "description": "Official SDK for the Aictrl Headless AI Engine",
   "type": "module",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "https://skill7.ai",
+  "homepage": "https://aictrl.ai",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aictrl-dev/skill7"
+    "url": "https://github.com/aictrl-dev/aictrl"
   },
   "scripts": {
     "typecheck": "tsgo --noEmit",

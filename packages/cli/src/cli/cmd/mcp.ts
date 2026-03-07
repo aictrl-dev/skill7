@@ -85,7 +85,7 @@ export const McpListCommand = cmd({
 
         if (servers.length === 0) {
           prompts.log.warn("No MCP servers configured")
-          prompts.outro("Add servers with: skill7 mcp add")
+          prompts.outro("Add servers with: aictrl mcp add")
           return
         }
 
@@ -162,7 +162,7 @@ export const McpAuthCommand = cmd({
 
         if (oauthServers.length === 0) {
           prompts.log.warn("No OAuth-capable MCP servers configured")
-          prompts.log.info("Remote MCP servers support OAuth by default. Add a remote server in skill7.json:")
+          prompts.log.info("Remote MCP servers support OAuth by default. Add a remote server in aictrl.json:")
           prompts.log.info(`
   "mcp": {
     "my-server": {
@@ -381,11 +381,11 @@ export const McpLogoutCommand = cmd({
 })
 
 async function resolveConfigPath(baseDir: string, global = false) {
-  // Check for existing config files (prefer .jsonc over .json, check .skill7/ subdirectory too)
-  const candidates = [path.join(baseDir, "skill7.json"), path.join(baseDir, "skill7.jsonc")]
+  // Check for existing config files (prefer .jsonc over .json, check .aictrl/ subdirectory too)
+  const candidates = [path.join(baseDir, "aictrl.json"), path.join(baseDir, "aictrl.jsonc")]
 
   if (!global) {
-    candidates.push(path.join(baseDir, ".skill7", "skill7.json"), path.join(baseDir, ".skill7", "skill7.jsonc"))
+    candidates.push(path.join(baseDir, ".aictrl", "aictrl.json"), path.join(baseDir, ".aictrl", "aictrl.jsonc"))
   }
 
   for (const candidate of candidates) {
@@ -394,7 +394,7 @@ async function resolveConfigPath(baseDir: string, global = false) {
     }
   }
 
-  // Default to skill7.json if none exist
+  // Default to aictrl.json if none exist
   return candidates[0]
 }
 
@@ -481,7 +481,7 @@ export const McpAddCommand = cmd({
         if (type === "local") {
           const command = await prompts.text({
             message: "Enter command to run",
-            placeholder: "e.g., skill7 x @modelcontextprotocol/server-filesystem",
+            placeholder: "e.g., aictrl x @modelcontextprotocol/server-filesystem",
             validate: (x) => (x && x.length > 0 ? undefined : "Required"),
           })
           if (prompts.isCancel(command)) throw new UI.CancelledError()
@@ -662,7 +662,7 @@ export const McpDebugCommand = cmd({
               params: {
                 protocolVersion: "2024-11-05",
                 capabilities: {},
-                clientInfo: { name: "skill7-debug", version: Installation.VERSION },
+                clientInfo: { name: "aictrl-debug", version: Installation.VERSION },
               },
               id: 1,
             }),
@@ -703,7 +703,7 @@ export const McpDebugCommand = cmd({
 
             try {
               const client = new Client({
-                name: "skill7-debug",
+                name: "aictrl-debug",
                 version: Installation.VERSION,
               })
               await client.connect(transport)

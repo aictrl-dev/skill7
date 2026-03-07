@@ -173,7 +173,7 @@ describe("session.prompt agent variant", () => {
           const other = await SessionPrompt.prompt({
             sessionID: session.id,
             agent: "build",
-            model: { providerID: "opencode", modelID: "kimi-k2.5-free" },
+            model: { providerID: "aictrl", modelID: "kimi-k2.5-free" },
             noReply: true,
             parts: [{ type: "text", text: "hello" }],
           })

@@ -43,7 +43,7 @@ process.on("uncaughtException", (e) => {
 
 let cli = yargs(hideBin(process.argv))
   .parserConfiguration({ "populate--": true })
-  .scriptName("skill7")
+  .scriptName("aictrl")
   .wrap(100)
   .help("help", "show help")
   .alias("help", "h")
@@ -73,12 +73,12 @@ let cli = yargs(hideBin(process.argv))
     process.env.OPENCODE = "1"
     process.env.OPENCODE_PID = String(process.pid)
 
-    Log.Default.info("skill7", {
+    Log.Default.info("aictrl", {
       version: Installation.VERSION,
       args: process.argv.slice(2),
     })
 
-    const marker = path.join(Global.Path.data, "skill7.db")
+    const marker = path.join(Global.Path.data, "aictrl.db")
     if (!(await Filesystem.exists(marker))) {
       const tty = process.stderr.isTTY
       process.stderr.write("Performing one time database migration, may take a few minutes..." + EOL)

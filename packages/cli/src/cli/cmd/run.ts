@@ -7,7 +7,7 @@ import { Flag } from "../../flag/flag"
 import { bootstrap } from "../bootstrap"
 import { EOL } from "os"
 import { Filesystem } from "../../util/filesystem"
-import { createSkill7Client, type Message, type OpencodeClient, type ToolPart } from "@aictrl/skill7-sdk/v2"
+import { createAictrlClient, type Message, type OpencodeClient, type ToolPart } from "@aictrl/aictrl-sdk/v2"
 import { Provider } from "../../provider/provider"
 import { Agent } from "../../agent/agent"
 import { PermissionNext } from "../../permission/next"
@@ -219,7 +219,7 @@ function normalizePath(input?: string) {
 
 export const RunCommand = cmd({
   command: "run [message..]",
-  describe: "run skill7 with a message",
+  describe: "run aictrl with a message",
   builder: (yargs: Argv) => {
     return yargs
       .positional("message", {
@@ -277,7 +277,7 @@ export const RunCommand = cmd({
       })
       .option("attach", {
         type: "string",
-        describe: "attach to a running skill7 server (e.g., http://localhost:4096)",
+        describe: "attach to a running aictrl server (e.g., http://localhost:4096)",
       })
       .option("dir", {
         type: "string",
@@ -608,7 +608,7 @@ export const RunCommand = cmd({
     }
 
     if (args.attach) {
-      const sdk = createSkill7Client({ baseUrl: args.attach, directory })
+      const sdk = createAictrlClient({ baseUrl: args.attach, directory })
       return await execute(sdk)
     }
 
@@ -616,7 +616,7 @@ export const RunCommand = cmd({
       const fetchFn = (async (input: RequestInfo | URL, init?: RequestInit) => {
         const request = new Request(input, init)
       }) as typeof globalThis.fetch
-      const sdk = createSkill7Client({ baseUrl: "http://skill7.internal", fetch: fetchFn })
+      const sdk = createAictrlClient({ baseUrl: "http://aictrl.internal", fetch: fetchFn })
       await execute(sdk)
     })
   },

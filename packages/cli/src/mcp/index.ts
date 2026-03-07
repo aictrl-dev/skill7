@@ -383,7 +383,7 @@ export namespace MCP {
       for (const { name, transport } of transports) {
         try {
           const client = new Client({
-            name: "skill7",
+            name: "aictrl",
             version: Installation.VERSION,
           })
           await withTimeout(client.connect(transport), connectTimeout)
@@ -419,7 +419,7 @@ export namespace MCP {
               // Show toast for needs_auth
               Bus.publish(TuiEvent.ToastShow, {
                 title: "MCP Authentication Required",
-                message: `Server "${key}" requires authentication. Run: skill7 mcp auth ${key}`,
+                message: `Server "${key}" requires authentication. Run: aictrl mcp auth ${key}`,
                 variant: "warning",
                 duration: 8000,
               }).catch((e) => log.debug("failed to show toast", { error: e }))
@@ -451,7 +451,7 @@ export namespace MCP {
         cwd,
         env: {
           ...process.env,
-          ...(cmd === "skill7" ? { BUN_BE_BUN: "1" } : {}),
+          ...(cmd === "aictrl" ? { BUN_BE_BUN: "1" } : {}),
           ...mcp.environment,
         },
       })
@@ -462,7 +462,7 @@ export namespace MCP {
       const connectTimeout = mcp.timeout ?? DEFAULT_TIMEOUT
       try {
         const client = new Client({
-          name: "skill7",
+          name: "aictrl",
           version: Installation.VERSION,
         })
         await withTimeout(client.connect(transport), connectTimeout)
@@ -799,7 +799,7 @@ export namespace MCP {
     // Try to connect - this will trigger the OAuth flow
     try {
       const client = new Client({
-        name: "skill7",
+        name: "aictrl",
         version: Installation.VERSION,
       })
       await client.connect(transport)

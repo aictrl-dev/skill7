@@ -253,7 +253,7 @@ export const AuthLoginCommand = cmd({
   describe: "log in to a provider",
   builder: (yargs) =>
     yargs.positional("url", {
-      describe: "skill7 auth provider",
+      describe: "aictrl auth provider",
       type: "string",
     }),
   async handler(args) {
@@ -263,7 +263,7 @@ export const AuthLoginCommand = cmd({
         UI.empty()
         prompts.intro("Add credential")
         if (args.url) {
-          const wellknown = await fetch(`${args.url}/.well-known/skill7`).then((x) => x.json() as any)
+          const wellknown = await fetch(`${args.url}/.well-known/aictrl`).then((x) => x.json() as any)
           prompts.log.info(`Running \`${wellknown.auth.command.join(" ")}\``)
           const proc = Process.spawn(wellknown.auth.command, {
             stdout: "pipe",
@@ -306,7 +306,7 @@ export const AuthLoginCommand = cmd({
         })
 
         const priority: Record<string, number> = {
-          skill7: 0,
+          aictrl: 0,
           anthropic: 1,
           "github-copilot": 2,
           openai: 3,
@@ -336,7 +336,7 @@ export const AuthLoginCommand = cmd({
                 label: x.name,
                 value: x.id,
                 hint: {
-                  skill7: "recommended",
+                  aictrl: "recommended",
                   anthropic: "Claude Max or API key",
                   openai: "ChatGPT Plus/Pro or API key",
                 }[x.id],
@@ -379,7 +379,7 @@ export const AuthLoginCommand = cmd({
           }
 
           prompts.log.warn(
-            `This only stores a credential for ${provider} - you will need configure it in skill7.json, check the docs for examples.`,
+            `This only stores a credential for ${provider} - you will need configure it in aictrl.json, check the docs for examples.`,
           )
         }
 
@@ -388,13 +388,13 @@ export const AuthLoginCommand = cmd({
             "Amazon Bedrock authentication priority:\n" +
               "  1. Bearer token (AWS_BEARER_TOKEN_BEDROCK or /connect)\n" +
               "  2. AWS credential chain (profile, access keys, IAM roles, EKS IRSA)\n\n" +
-              "Configure via skill7.json options (profile, region, endpoint) or\n" +
+              "Configure via aictrl.json options (profile, region, endpoint) or\n" +
               "AWS environment variables (AWS_PROFILE, AWS_REGION, AWS_ACCESS_KEY_ID, AWS_WEB_IDENTITY_TOKEN_FILE).",
           )
         }
 
-        if (provider === "skill7") {
-          prompts.log.info("Create an api key at https://skill7.ai/auth")
+        if (provider === "aictrl") {
+          prompts.log.info("Create an api key at https://aictrl.ai/auth")
         }
 
         if (provider === "vercel") {
@@ -403,7 +403,7 @@ export const AuthLoginCommand = cmd({
 
         if (["cloudflare", "cloudflare-ai-gateway"].includes(provider)) {
           prompts.log.info(
-            "Cloudflare AI Gateway can be configured with CLOUDFLARE_GATEWAY_ID, CLOUDFLARE_ACCOUNT_ID, and CLOUDFLARE_API_TOKEN environment variables. Read more: https://skill7.ai/docs/providers/#cloudflare-ai-gateway",
+            "Cloudflare AI Gateway can be configured with CLOUDFLARE_GATEWAY_ID, CLOUDFLARE_ACCOUNT_ID, and CLOUDFLARE_API_TOKEN environment variables. Read more: https://aictrl.ai/docs/providers/#cloudflare-ai-gateway",
           )
         }
 

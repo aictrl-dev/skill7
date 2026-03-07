@@ -12,7 +12,7 @@ import { Global } from "@/global"
 
 const log = Log.create({ service: "tui.migrate" })
 
-const TUI_SCHEMA_URL = "https://skill7.ai/tui.json"
+const TUI_SCHEMA_URL = "https://aictrl.ai/tui.json"
 
 const LegacyTheme = TuiInfo.shape.theme.optional()
 const LegacyRecord = z.record(z.string(), z.unknown()).optional()
@@ -32,13 +32,13 @@ interface MigrateInput {
 }
 
 /**
- * Migrates tui-specific keys (theme, keybinds, tui) from skill7.json files
+ * Migrates tui-specific keys (theme, keybinds, tui) from aictrl.json files
  * into dedicated tui.json files. Migration is performed per-directory and
  * skips only locations where a tui.json already exists.
  */
 export async function migrateTuiConfig(input: MigrateInput) {
-  const skill7 = await skill7Files(input)
-  for (const file of skill7) {
+  const aictrl = await aictrlFiles(input)
+  for (const file of aictrl) {
     const source = await Filesystem.readText(file).catch((error) => {
       log.warn("failed to read config for tui migration", { path: file, error })
       return undefined
@@ -134,16 +134,16 @@ async function backupAndStripLegacy(file: string, source: string) {
     })
 }
 
-async function skill7Files(input: { directories: string[]; managed: string }) {
+async function aictrlFiles(input: { directories: string[]; managed: string }) {
   const project = Flag.OPENCODE_DISABLE_PROJECT_CONFIG
     ? []
-    : await ConfigPaths.projectFiles("skill7", Instance.directory, Instance.worktree)
-  const files = [...project, ...ConfigPaths.fileInDirectory(Global.Path.config, "skill7")]
+    : await ConfigPaths.projectFiles("aictrl", Instance.directory, Instance.worktree)
+  const files = [...project, ...ConfigPaths.fileInDirectory(Global.Path.config, "aictrl")]
   for (const dir of unique(input.directories)) {
-    files.push(...ConfigPaths.fileInDirectory(dir, "skill7"))
+    files.push(...ConfigPaths.fileInDirectory(dir, "aictrl"))
   }
   if (Flag.OPENCODE_CONFIG) files.push(Flag.OPENCODE_CONFIG)
-  files.push(...ConfigPaths.fileInDirectory(input.managed, "skill7"))
+  files.push(...ConfigPaths.fileInDirectory(input.managed, "aictrl"))
 
   const existing = await Promise.all(
     unique(files).map(async (file) => {

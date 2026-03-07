@@ -1,8 +1,8 @@
-# Skill7 Engine
+# Aictrl Engine
 
 The Lightweight Headless Runtime for AI Agent Skills.
 
-Skill7 is a 100% headless, server-side execution harness designed for autonomous agentic workflows. It provides a secure, modular environment to run, measure, and scale agent skills without the bloat of a desktop or terminal UI.
+Aictrl is a 100% headless, server-side execution harness designed for autonomous agentic workflows. It provides a secure, modular environment to run, measure, and scale agent skills without the bloat of a desktop or terminal UI.
 
 ## Key Features
 
@@ -16,7 +16,7 @@ Skill7 is a 100% headless, server-side execution harness designed for autonomous
 ## Installation
 
 ```bash
-npm i -g @skill7/cli
+npm i -g @aictrl/cli
 ```
 
 ## Quick Start
@@ -29,7 +29,7 @@ s7 run "analyze the security of this repository"
 
 ## Attribution
 
-Skill7 is based on the [OpenCode](https://opencode.ai) project and is licensed under the MIT License.
+Aictrl is based on the [Aictrl](https://aictrl.ai) project and is licensed under the MIT License.
 
 ---
-© 2026 [skill7.ai](https://skill7.ai)
+© 2026 [aictrl.ai](https://aictrl.ai)

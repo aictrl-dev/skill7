@@ -5,7 +5,7 @@ import { $ } from "bun"
 
 export const PrCommand = cmd({
   command: "pr <number>",
-  describe: "fetch and checkout a GitHub PR branch, then run skill7",
+  describe: "fetch and checkout a GitHub PR branch, then run aictrl",
   builder: (yargs) =>
     yargs.positional("number", {
       type: "number",
@@ -63,15 +63,15 @@ export const PrCommand = cmd({
               await $`git branch --set-upstream-to=${remoteName}/${headRefName} ${localBranchName}`.nothrow()
             }
 
-            // Check for skill7 session link in PR body
+            // Check for aictrl session link in PR body
             if (prInfo && prInfo.body) {
               const sessionMatch = prInfo.body.match(/https:\/\/opncd\.ai\/s\/([a-zA-Z0-9_-]+)/)
               if (sessionMatch) {
                 const sessionUrl = sessionMatch[0]
-                UI.println(`Found skill7 session: ${sessionUrl}`)
+                UI.println(`Found aictrl session: ${sessionUrl}`)
                 UI.println(`Importing session...`)
 
-                const importResult = await $`skill7 import ${sessionUrl}`.nothrow()
+                const importResult = await $`aictrl import ${sessionUrl}`.nothrow()
                 if (importResult.exitCode === 0) {
                   const importOutput = importResult.text().trim()
                   // Extract session ID from the output (format: "Imported session: <session-id>")
@@ -88,23 +88,23 @@ export const PrCommand = cmd({
 
         UI.println(`Successfully checked out PR #${prNumber} as branch '${localBranchName}'`)
         UI.println()
-        UI.println("Starting skill7...")
+        UI.println("Starting aictrl...")
         UI.println()
 
-        // Launch skill7 TUI with session ID if available
+        // Launch aictrl TUI with session ID if available
         const { spawn } = await import("child_process")
-        const skill7Args = sessionId ? ["-s", sessionId] : []
-        const skill7Process = spawn("skill7", skill7Args, {
+        const aictrlArgs = sessionId ? ["-s", sessionId] : []
+        const aictrlProcess = spawn("aictrl", aictrlArgs, {
           stdio: "inherit",
           cwd: process.cwd(),
         })
 
         await new Promise<void>((resolve, reject) => {
-          skill7Process.on("exit", (code) => {
+          aictrlProcess.on("exit", (code) => {
             if (code === 0) resolve()
-            else reject(new Error(`skill7 exited with code ${code}`))
+            else reject(new Error(`aictrl exited with code ${code}`))
           })
-          skill7Process.on("error", reject)
+          aictrlProcess.on("error", reject)
         })
       },
     })

@@ -45,11 +45,11 @@ export namespace Config {
   function systemManagedConfigDir(): string {
     switch (process.platform) {
       case "darwin":
-        return "/Library/Application Support/skill7"
+        return "/Library/Application Support/aictrl"
       case "win32":
-        return path.join(process.env.ProgramData || "C:\\ProgramData", "skill7")
+        return path.join(process.env.ProgramData || "C:\\ProgramData", "aictrl")
       default:
-        return "/etc/skill7"
+        return "/etc/aictrl"
     }
   }
 
@@ -74,32 +74,32 @@ export namespace Config {
   export const state = Instance.state(async () => {
     const auth = await Auth.all()
 
-    // Config loading order (low -> high precedence): https://skill7.ai/docs/config#precedence-order
-    // 1) Remote .well-known/skill7 (org defaults)
-    // 2) Global config (~/.config/skill7/skill7.json{,c})
+    // Config loading order (low -> high precedence): https://aictrl.ai/docs/config#precedence-order
+    // 1) Remote .well-known/aictrl (org defaults)
+    // 2) Global config (~/.config/aictrl/aictrl.json{,c})
     // 3) Custom config (OPENCODE_CONFIG)
-    // 4) Project config (skill7.json{,c})
-    // 5) .skill7 directories (.skill7/agents/, .skill7/commands/, .skill7/plugins/, .skill7/skill7.json{,c})
+    // 4) Project config (aictrl.json{,c})
+    // 5) .aictrl directories (.aictrl/agents/, .aictrl/commands/, .aictrl/plugins/, .aictrl/aictrl.json{,c})
     // 6) Inline config (OPENCODE_CONFIG_CONTENT)
     // Managed config directory is enterprise-only and always overrides everything above.
     let result: Info = {}
     for (const [key, value] of Object.entries(auth)) {
       if (value.type === "wellknown") {
         process.env[value.key] = value.token
-        log.debug("fetching remote config", { url: `${key}/.well-known/skill7` })
-        const response = await fetch(`${key}/.well-known/skill7`)
+        log.debug("fetching remote config", { url: `${key}/.well-known/aictrl` })
+        const response = await fetch(`${key}/.well-known/aictrl`)
         if (!response.ok) {
           throw new Error(`failed to fetch remote config from ${key}: ${response.status}`)
         }
         const wellknown = (await response.json()) as any
         const remoteConfig = wellknown.config ?? {}
         // Add $schema to prevent load() from trying to write back to a non-existent file
-        if (!remoteConfig.$schema) remoteConfig.$schema = "https://skill7.ai/config.json"
+        if (!remoteConfig.$schema) remoteConfig.$schema = "https://aictrl.ai/config.json"
         result = mergeConfigConcatArrays(
           result,
           await load(JSON.stringify(remoteConfig), {
-            dir: path.dirname(`${key}/.well-known/skill7`),
-            source: `${key}/.well-known/skill7`,
+            dir: path.dirname(`${key}/.well-known/aictrl`),
+            source: `${key}/.well-known/aictrl`,
           }),
         )
         log.debug("loaded remote config from well-known", { url: key })
@@ -121,7 +121,7 @@ export namespace Config {
 
     // Project config overrides global and remote config.
     if (!Flag.OPENCODE_DISABLE_PROJECT_CONFIG) {
-      for (const file of await ConfigPaths.projectFiles("skill7", Instance.directory, Instance.worktree)) {
+      for (const file of await ConfigPaths.projectFiles("aictrl", Instance.directory, Instance.worktree)) {
         result = mergeConfigConcatArrays(result, await loadFile(file))
       }
     }
@@ -132,7 +132,7 @@ export namespace Config {
 
     const directories = await ConfigPaths.directories(Instance.directory, Instance.worktree)
 
-    // .skill7 directory config overrides (project and global) config sources.
+    // .aictrl directory config overrides (project and global) config sources.
     if (Flag.OPENCODE_CONFIG_DIR) {
       log.debug("loading config from OPENCODE_CONFIG_DIR", { path: Flag.OPENCODE_CONFIG_DIR })
     }
@@ -140,8 +140,8 @@ export namespace Config {
     const deps = []
 
     for (const dir of unique(directories)) {
-      if (dir.endsWith(".skill7") || dir === Flag.OPENCODE_CONFIG_DIR) {
-        for (const file of ["skill7.jsonc", "skill7.json"]) {
+      if (dir.endsWith(".aictrl") || dir === Flag.OPENCODE_CONFIG_DIR) {
+        for (const file of ["aictrl.jsonc", "aictrl.json"]) {
           log.debug(`loading config from ${path.join(dir, file)}`)
           result = mergeConfigConcatArrays(result, await loadFile(path.join(dir, file)))
           // to satisfy the type checker
@@ -181,7 +181,7 @@ export namespace Config {
     // which would fail on system directories requiring elevated permissions
     // This way it only loads config file and not skills/plugins/commands
     if (existsSync(managedDir)) {
-      for (const file of ["skill7.jsonc", "skill7.json"]) {
+      for (const file of ["aictrl.jsonc", "aictrl.json"]) {
         result = mergeConfigConcatArrays(result, await loadFile(path.join(managedDir, file)))
       }
     }
@@ -352,7 +352,7 @@ export namespace Config {
       })
       if (!md) continue
 
-      const patterns = ["/.skill7/command/", "/.skill7/commands/", "/command/", "/commands/"]
+      const patterns = ["/.aictrl/command/", "/.aictrl/commands/", "/command/", "/commands/"]
       const file = rel(item, patterns) ?? path.basename(item)
       const name = trim(file)
 
@@ -391,7 +391,7 @@ export namespace Config {
       })
       if (!md) continue
 
-      const patterns = ["/.skill7/agent/", "/.skill7/agents/", "/agent/", "/agents/"]
+      const patterns = ["/.aictrl/agent/", "/.aictrl/agents/", "/agent/", "/agents/"]
       const file = rel(item, patterns) ?? path.basename(item)
       const agentName = trim(file)
 
@@ -467,7 +467,7 @@ export namespace Config {
    *
    * @example
    * getPluginName("file:///path/to/plugin/foo.js") // "foo"
-   * getPluginName("oh-my-skill7@2.4.3") // "oh-my-skill7"
+   * getPluginName("oh-my-aictrl@2.4.3") // "oh-my-aictrl"
    * getPluginName("@scope/pkg@1.0.0") // "@scope/pkg"
    */
   export function getPluginName(plugin: string): string {
@@ -485,20 +485,20 @@ export namespace Config {
    * Deduplicates plugins by name, with later entries (higher priority) winning.
    * Priority order (highest to lowest):
    * 1. Local plugin/ directory
-   * 2. Local skill7.json
+   * 2. Local aictrl.json
    * 3. Global plugin/ directory
-   * 4. Global skill7.json
+   * 4. Global aictrl.json
    *
    * Since plugins are added in low-to-high priority order,
    * we reverse, deduplicate (keeping first occurrence), then restore order.
    */
   export function deduplicatePlugins(plugins: string[]): string[] {
     // seenNames: canonical plugin names for duplicate detection
-    // e.g., "oh-my-skill7", "@scope/pkg"
+    // e.g., "oh-my-aictrl", "@scope/pkg"
     const seenNames = new Set<string>()
 
     // uniqueSpecifiers: full plugin specifiers to return
-    // e.g., "oh-my-skill7@2.4.3", "file:///path/to/plugin.js"
+    // e.g., "oh-my-aictrl@2.4.3", "file:///path/to/plugin.js"
     const uniqueSpecifiers: string[] = []
 
     for (const specifier of plugins.toReversed()) {
@@ -914,7 +914,7 @@ export namespace Config {
       port: z.number().int().positive().optional().describe("Port to listen on"),
       hostname: z.string().optional().describe("Hostname to listen on"),
       mdns: z.boolean().optional().describe("Enable mDNS service discovery"),
-      mdnsDomain: z.string().optional().describe("Custom domain name for mDNS service (default: skill7.local)"),
+      mdnsDomain: z.string().optional().describe("Custom domain name for mDNS service (default: aictrl.local)"),
       cors: z.array(z.string()).optional().describe("Additional domains to allow for CORS"),
     })
     .strict()
@@ -987,7 +987,7 @@ export namespace Config {
       command: z
         .record(z.string(), Command)
         .optional()
-        .describe("Command configuration, see https://skill7.ai/docs/commands"),
+        .describe("Command configuration, see https://aictrl.ai/docs/commands"),
       skills: Skills.optional().describe("Additional skill folder paths"),
       watcher: z
         .object({
@@ -1054,7 +1054,7 @@ export namespace Config {
         })
         .catchall(Agent)
         .optional()
-        .describe("Agent configuration, see https://skill7.ai/docs/agents"),
+        .describe("Agent configuration, see https://aictrl.ai/docs/agents"),
       provider: z
         .record(z.string(), Provider)
         .optional()
@@ -1177,8 +1177,8 @@ export namespace Config {
     let result: Info = pipe(
       {},
       mergeDeep(await loadFile(path.join(Global.Path.config, "config.json"))),
-      mergeDeep(await loadFile(path.join(Global.Path.config, "skill7.json"))),
-      mergeDeep(await loadFile(path.join(Global.Path.config, "skill7.jsonc"))),
+      mergeDeep(await loadFile(path.join(Global.Path.config, "aictrl.json"))),
+      mergeDeep(await loadFile(path.join(Global.Path.config, "aictrl.jsonc"))),
     )
 
     const legacy = path.join(Global.Path.config, "config")
@@ -1191,7 +1191,7 @@ export namespace Config {
         .then(async (mod) => {
           const { provider, model, ...rest } = mod.default
           if (provider && model) result.model = `${provider}/${model}`
-          result["$schema"] = "https://skill7.ai/config.json"
+          result["$schema"] = "https://aictrl.ai/config.json"
           result = mergeDeep(result, rest)
           await Filesystem.writeJson(path.join(Global.Path.config, "config.json"), result)
           await fs.unlink(legacy)
@@ -1228,15 +1228,15 @@ export namespace Config {
       delete copy.theme
       delete copy.keybinds
       delete copy.tui
-      log.warn("tui keys in skill7 config are deprecated; move them to tui.json", { path: source })
+      log.warn("tui keys in aictrl config are deprecated; move them to tui.json", { path: source })
       return copy
     })()
 
     const parsed = Info.safeParse(normalized)
     if (parsed.success) {
       if (!parsed.data.$schema && isFile) {
-        parsed.data.$schema = "https://skill7.ai/config.json"
-        const updated = original.replace(/^\s*\{/, '{\n  "$schema": "https://skill7.ai/config.json",')
+        parsed.data.$schema = "https://aictrl.ai/config.json"
+        const updated = original.replace(/^\s*\{/, '{\n  "$schema": "https://aictrl.ai/config.json",')
         await Bun.write(options.path, updated).catch(() => {})
       }
       const data = parsed.data
@@ -1292,7 +1292,7 @@ export namespace Config {
   }
 
   function globalConfigFile() {
-    const candidates = ["skill7.jsonc", "skill7.json", "config.json"].map((file) =>
+    const candidates = ["aictrl.jsonc", "aictrl.json", "config.json"].map((file) =>
       path.join(Global.Path.config, file),
     )
     for (const file of candidates) {

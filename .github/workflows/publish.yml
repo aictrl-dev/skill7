@@ -19,13 +19,13 @@ jobs:
       - name: Build Packages
         run: bun turbo build
 
-      - name: Publish @skill7/cli
+      - name: Publish @aictrl/cli
         run: bun publish
         working-directory: packages/cli
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish @skill7-ai/sdk
+      - name: Publish @aictrl-ai/sdk
         run: bun publish
         working-directory: packages/sdk/js
         env:

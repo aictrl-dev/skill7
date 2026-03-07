@@ -6,14 +6,14 @@ import { UI } from "./ui"
 
 export function FormatError(input: unknown) {
   if (MCP.Failed.isInstance(input))
-    return `MCP server "${input.data.name}" failed. Note, skill7 does not support MCP authentication yet.`
+    return `MCP server "${input.data.name}" failed. Note, aictrl does not support MCP authentication yet.`
   if (Provider.ModelNotFoundError.isInstance(input)) {
     const { providerID, modelID, suggestions } = input.data
     return [
       `Model not found: ${providerID}/${modelID}`,
       ...(Array.isArray(suggestions) && suggestions.length ? ["Did you mean: " + suggestions.join(", ")] : []),
-      `Try: \`skill7 models\` to list available models`,
-      `Or check your config (skill7.json) provider/model names`,
+      `Try: \`aictrl models\` to list available models`,
+      `Or check your config (aictrl.json) provider/model names`,
     ].join("\n")
   }
   if (Provider.InitError.isInstance(input)) {

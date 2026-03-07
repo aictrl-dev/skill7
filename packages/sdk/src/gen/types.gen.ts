@@ -1209,7 +1209,7 @@ export type Config = {
     diff_style?: "auto" | "stacked"
   }
   /**
-   * Command configuration, see https://skill7.ai/docs/commands
+   * Command configuration, see https://aictrl.ai/docs/commands
    */
   command?: {
     [key: string]: {
@@ -1266,7 +1266,7 @@ export type Config = {
     [key: string]: AgentConfig | undefined
   }
   /**
-   * Agent configuration, see https://skill7.ai/docs/agent
+   * Agent configuration, see https://aictrl.ai/docs/agent
    */
   agent?: {
     plan?: AgentConfig

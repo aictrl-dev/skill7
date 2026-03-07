@@ -41,7 +41,7 @@ import { Config } from "@/config/config"
 import { Todo } from "@/session/todo"
 import { z } from "zod"
 import { LoadAPIKeyError } from "ai"
-import type { AssistantMessage, Event, OpencodeClient, SessionMessageResponse, ToolPart } from "@aictrl/skill7-sdk/v2"
+import type { AssistantMessage, Event, OpencodeClient, SessionMessageResponse, ToolPart } from "@aictrl/aictrl-sdk/v2"
 import { applyPatch } from "diff"
 
 type ModeOption = { id: string; name: string; description?: string }
@@ -518,18 +518,18 @@ export namespace ACP {
       log.info("initialize", { protocolVersion: params.protocolVersion })
 
       const authMethod: AuthMethod = {
-        description: "Run `skill7 auth login` in the terminal",
-        name: "Login with skill7",
-        id: "skill7-login",
+        description: "Run `aictrl auth login` in the terminal",
+        name: "Login with aictrl",
+        id: "aictrl-login",
       }
 
       // If client supports terminal-auth capability, use that instead.
       if (params.clientCapabilities?._meta?.["terminal-auth"] === true) {
         authMethod._meta = {
           "terminal-auth": {
-            command: "skill7",
+            command: "aictrl",
             args: ["auth", "login"],
-            label: "Skill7 Login",
+            label: "Aictrl Login",
           },
         }
       }
@@ -554,7 +554,7 @@ export namespace ACP {
         },
         authMethods: [authMethod],
         agentInfo: {
-          name: "Skill7",
+          name: "Aictrl",
           version: Installation.VERSION,
         },
       }
@@ -980,7 +980,7 @@ export namespace ACP {
           }
         } else if (part.type === "file") {
           // Replay file attachments as appropriate ACP content blocks.
-          // Skill7 stores files internally as { type: "file", url, filename, mime }.
+          // Aictrl stores files internally as { type: "file", url, filename, mime }.
           // We convert these back to ACP blocks based on the URL scheme and MIME type:
           // - file:// URLs → resource_link
           // - data: URLs with image/* → image block
@@ -1562,12 +1562,12 @@ export namespace ACP {
 
     if (specified && !providers.length) return specified
 
-    const skill7Provider = providers.find((p) => p.id === "skill7")
-    if (skill7Provider) {
-      if (skill7Provider.models["big-pickle"]) {
-        return { providerID: "skill7", modelID: "big-pickle" }
+    const aictrlProvider = providers.find((p) => p.id === "aictrl")
+    if (aictrlProvider) {
+      if (aictrlProvider.models["big-pickle"]) {
+        return { providerID: "aictrl", modelID: "big-pickle" }
       }
-      const [best] = Provider.sort(Object.values(skill7Provider.models))
+      const [best] = Provider.sort(Object.values(aictrlProvider.models))
       if (best) {
         return {
           providerID: best.providerID,
@@ -1587,7 +1587,7 @@ export namespace ACP {
 
     if (specified) return specified
 
-    return { providerID: "skill7", modelID: "big-pickle" }
+    return { providerID: "aictrl", modelID: "big-pickle" }
   }
 
   function parseUri(
@@ -1699,7 +1699,7 @@ export namespace ACP {
     availableVariants: string[]
   }) {
     return {
-      skill7: {
+      aictrl: {
         modelId: `${input.model.providerID}/${input.model.modelID}`,
         variant: input.variant ?? null,
         availableVariants: input.availableVariants,

@@ -1,6 +1,6 @@
 import type {
   Event,
-  createSkill7Client,
+  createAictrlClient,
   Project,
   Model,
   Provider,
@@ -10,7 +10,7 @@ import type {
   Part,
   Auth,
   Config,
-} from "@aictrl/skill7-sdk"
+} from "@aictrl/aictrl-sdk"
 
 import type { BunShell } from "./shell"
 import { type ToolDefinition } from "./tool"
@@ -24,7 +24,7 @@ export type ProviderContext = {
 }
 
 export type PluginInput = {
-  client: ReturnType<typeof createSkill7Client>
+  client: ReturnType<typeof createAictrlClient>
   project: Project
   directory: string
   worktree: string

@@ -103,7 +103,7 @@ export namespace Agent {
             },
             edit: {
               "*": "deny",
-              [path.join(".skill7", "plans", "*.md")]: "allow",
+              [path.join(".aictrl", "plans", "*.md")]: "allow",
               [path.relative(Instance.worktree, path.join(Global.Path.data, path.join("plans", "*.md")))]: "allow",
             },
           }),

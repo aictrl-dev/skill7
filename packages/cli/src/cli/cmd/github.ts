@@ -132,9 +132,9 @@ type IssueQueryResponse = {
   }
 }
 
-const AGENT_USERNAME = "skill7-agent[bot]"
+const AGENT_USERNAME = "aictrl-agent[bot]"
 const AGENT_REACTION = "eyes"
-const WORKFLOW_FILE = ".github/workflows/skill7.yml"
+const WORKFLOW_FILE = ".github/workflows/aictrl.yml"
 
 // Event categories for routing
 // USER_EVENTS: triggered by user actions, have actor/issueId, support reactions/comments
@@ -241,7 +241,7 @@ export const GithubInstallCommand = cmd({
                 "",
                 "    3. Go to a GitHub issue and comment `/oc summarize` to see the agent in action",
                 "",
-                "   Learn more about the GitHub agent - https://skill7.ai/docs/github/#usage-examples",
+                "   Learn more about the GitHub agent - https://aictrl.ai/docs/github/#usage-examples",
               ].join("\n"),
             )
           }
@@ -265,7 +265,7 @@ export const GithubInstallCommand = cmd({
 
           async function promptProvider() {
             const priority: Record<string, number> = {
-              skill7: 0,
+              aictrl: 0,
               anthropic: 1,
               openai: 2,
               google: 3,
@@ -323,7 +323,7 @@ export const GithubInstallCommand = cmd({
             if (installation) return s.stop("GitHub app already installed")
 
             // Open browser
-            const url = "https://github.com/apps/skill7-agent"
+            const url = "https://github.com/apps/aictrl-agent"
             const command =
               process.platform === "darwin"
                 ? `open "${url}"`
@@ -360,7 +360,7 @@ export const GithubInstallCommand = cmd({
 
             async function getInstallation() {
               return await fetch(
-                `https://api.skill7.ai/get_github_app_installation?owner=${app.owner}&repo=${app.repo}`,
+                `https://api.aictrl.ai/get_github_app_installation?owner=${app.owner}&repo=${app.repo}`,
               )
                 .then((res) => res.json())
                 .then((data) => data.installation)
@@ -375,7 +375,7 @@ export const GithubInstallCommand = cmd({
 
             await Filesystem.write(
               path.join(app.root, WORKFLOW_FILE),
-              `name: skill7
+              `name: aictrl
 
 on:
   issue_comment:
@@ -384,12 +384,12 @@ on:
     types: [created]
 
 jobs:
-  skill7:
+  aictrl:
     if: |
       contains(github.event.comment.body, ' /oc') ||
       startsWith(github.event.comment.body, '/oc') ||
-      contains(github.event.comment.body, ' /skill7') ||
-      startsWith(github.event.comment.body, '/skill7')
+      contains(github.event.comment.body, ' /aictrl') ||
+      startsWith(github.event.comment.body, '/aictrl')
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -402,8 +402,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Run skill7
-        uses: anomalyco/skill7/github@latest${envStr}
+      - name: Run aictrl
+        uses: anomalyco/aictrl/github@latest${envStr}
         with:
           model: ${provider}/${model}`,
             )
@@ -473,7 +473,7 @@ export const GithubRunCommand = cmd({
           ? (payload as IssueCommentEvent | IssuesEvent).issue.number
           : (payload as PullRequestEvent | PullRequestReviewCommentEvent).pull_request.number
       const runUrl = `/${owner}/${repo}/actions/runs/${runId}`
-      const shareBaseUrl = isMock ? "https://dev.skill7.ai" : "https://skill7.ai"
+      const shareBaseUrl = isMock ? "https://dev.aictrl.ai" : "https://aictrl.ai"
 
       let appToken: string
       let octoRest: Octokit
@@ -521,7 +521,7 @@ export const GithubRunCommand = cmd({
           await addReaction(commentType)
         }
 
-        // Setup skill7 session
+        // Setup aictrl session
         const repoData = await fetchRepo()
         session = await Session.create({
           permission: [
@@ -539,7 +539,7 @@ export const GithubRunCommand = cmd({
           await Session.share(session.id)
           return session.id.slice(-8)
         })()
-        console.log("skill7 session", session.id)
+        console.log("aictrl session", session.id)
 
         // Handle event types:
         // REPO_EVENTS (schedule, workflow_dispatch): no issue/PR context, output to logs/PR only
@@ -712,7 +712,7 @@ export const GithubRunCommand = cmd({
 
       function normalizeOidcBaseUrl(): string {
         const value = process.env["OIDC_BASE_URL"]
-        if (!value) return "https://api.skill7.ai"
+        if (!value) return "https://api.aictrl.ai"
         return value.replace(/\/+$/, "")
       }
 
@@ -761,7 +761,7 @@ export const GithubRunCommand = cmd({
         }
 
         const reviewContext = getReviewCommentContext()
-        const mentions = (process.env["MENTIONS"] || "/skill7,/oc")
+        const mentions = (process.env["MENTIONS"] || "/aictrl,/oc")
           .split(",")
           .map((m) => m.trim().toLowerCase())
           .filter(Boolean)
@@ -908,7 +908,7 @@ export const GithubRunCommand = cmd({
       }
 
       async function chat(message: string, files: PromptFiles = []) {
-        console.log("Sending message to skill7...")
+        console.log("Sending message to aictrl...")
 
         const result = await SessionPrompt.prompt({
           sessionID: session.id,
@@ -1004,7 +1004,7 @@ export const GithubRunCommand = cmd({
 
       async function getOidcToken() {
         try {
-          return await core.getIDToken("skill7-github-action")
+          return await core.getIDToken("aictrl-github-action")
         } catch (error) {
           console.error("Failed to get OIDC token:", error instanceof Error ? error.message : error)
           throw new Error(
@@ -1106,9 +1106,9 @@ export const GithubRunCommand = cmd({
           .join("")
         if (type === "schedule" || type === "dispatch") {
           const hex = crypto.randomUUID().slice(0, 6)
-          return `skill7/${type}-${hex}-${timestamp}`
+          return `aictrl/${type}-${hex}-${timestamp}`
         }
-        return `skill7/${type}${issueId}-${timestamp}`
+        return `aictrl/${type}${issueId}-${timestamp}`
       }
 
       async function pushToNewBranch(summary: string, branch: string, commit: boolean, isSchedule: boolean) {
@@ -1387,9 +1387,9 @@ Co-authored-by: ${actor} <${actor}@users.noreply.github.com>"`
           const titleAlt = encodeURIComponent(session.title.substring(0, 50))
           const title64 = Buffer.from(session.title.substring(0, 700), "utf8").toString("base64")
 
-          return `<a href="${shareBaseUrl}/s/${shareId}"><img width="200" alt="${titleAlt}" src="https://social-cards.sst.dev/skill7-share/${title64}.png?model=${providerID}/${modelID}&version=${session.version}&id=${shareId}" /></a>\n`
+          return `<a href="${shareBaseUrl}/s/${shareId}"><img width="200" alt="${titleAlt}" src="https://social-cards.sst.dev/aictrl-share/${title64}.png?model=${providerID}/${modelID}&version=${session.version}&id=${shareId}" /></a>\n`
         })()
-        const shareUrl = shareId ? `[skill7 session](${shareBaseUrl}/s/${shareId})&nbsp;&nbsp;|&nbsp;&nbsp;` : ""
+        const shareUrl = shareId ? `[aictrl session](${shareBaseUrl}/s/${shareId})&nbsp;&nbsp;|&nbsp;&nbsp;` : ""
         return `\n\n${image}${shareUrl}[github run](${runUrl})`
       }
 
@@ -1450,7 +1450,7 @@ query($owner: String!, $repo: String!, $number: Int!) {
         return [
           "<github_action_context>",
           "You are running as a GitHub Action. Important:",
-          "- Git push and PR creation are handled AUTOMATICALLY by the skill7 infrastructure after your response",
+          "- Git push and PR creation are handled AUTOMATICALLY by the aictrl infrastructure after your response",
           "- Do NOT include warnings or disclaimers about GitHub tokens, workflow permissions, or PR creation capabilities",
           "- Do NOT suggest manual steps for creating PRs or pushing code - this happens automatically",
           "- Focus only on the code changes and your analysis/response",
@@ -1588,7 +1588,7 @@ query($owner: String!, $repo: String!, $number: Int!) {
         return [
           "<github_action_context>",
           "You are running as a GitHub Action. Important:",
-          "- Git push and PR creation are handled AUTOMATICALLY by the skill7 infrastructure after your response",
+          "- Git push and PR creation are handled AUTOMATICALLY by the aictrl infrastructure after your response",
           "- Do NOT include warnings or disclaimers about GitHub tokens, workflow permissions, or PR creation capabilities",
           "- Do NOT suggest manual steps for creating PRs or pushing code - this happens automatically",
           "- Focus only on the code changes and your analysis/response",
