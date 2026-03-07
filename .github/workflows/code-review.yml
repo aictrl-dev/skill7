@@ -85,9 +85,7 @@ jobs:
 
       - name: Install aictrl CLI
         if: steps.check_changes.outputs.skip != 'true'
-        run: |
-          cd /tmp
-          bun install @aictrl/cli@latest
+        run: npm install -g @aictrl/cli@latest
 
       - name: Run Aictrl Review
         if: steps.check_changes.outputs.skip != 'true'
@@ -98,7 +96,7 @@ jobs:
         run: |
           echo "Starting review with zai-coding-plan/glm-5 for PR #$PR_NUMBER SHA $PR_SHA..."
 
-          /tmp/node_modules/.bin/aictrl run --model zai-coding-plan/glm-5 "Review the changes in PR #$PR_NUMBER for the aictrl CLI.
+          aictrl run --model zai-coding-plan/glm-5 "Review the changes in PR #$PR_NUMBER for the aictrl CLI.
 
           **IMPORTANT**: This is a code review only. Do NOT run tests, npm commands, or build commands. Only read source files and git diffs.
 
