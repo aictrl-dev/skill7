@@ -28,7 +28,11 @@ jobs:
         run: bun install
 
       - name: Build Packages
-        run: bun turbo build
+        env:
+          AICTRL_VERSION: ${{ github.event.release.tag_name }}
+        run: |
+          export AICTRL_VERSION="${AICTRL_VERSION#v}"
+          bun turbo build
 
       - name: Publish @aictrl/util
         working-directory: packages/util
@@ -58,6 +62,8 @@ jobs:
             delete pkg.peerDependencies;
             delete pkg.peerDependenciesMeta;
             delete pkg.overrides;
+            delete pkg.exports;
+            delete pkg.type;
             require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
           "
 
