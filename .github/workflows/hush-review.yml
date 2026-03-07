@@ -18,7 +18,7 @@ jobs:
       - name: Get PR Diff
         id: diff
         run: |
-          git diff origin/${{ github.base_ref }}...HEAD > pr_diff.txt
+          git diff ${{ github.event.pull_request.base.sha }}...HEAD > pr_diff.txt
           echo "diff_path=$(pwd)/pr_diff.txt" >> $GITHUB_OUTPUT
 
       - name: Setup Headless Inputs
@@ -30,9 +30,9 @@ jobs:
           echo "PR Number: ${{ github.event.pull_request.number }}" >> .inputs/TASK.md
           echo "Base Ref: ${{ github.base_ref }}" >> .inputs/TASK.md
           echo "## Diff" >> .inputs/TASK.md
-          echo "```diff" >> .inputs/TASK.md
+          echo '```diff' >> .inputs/TASK.md
           cat pr_diff.txt >> .inputs/TASK.md
-          echo "```" >> .inputs/TASK.md
+          echo '```' >> .inputs/TASK.md
           
           echo "# Inputs README" > .inputs/README.md
           echo "TASK.md contains the PR diff and metadata." >> .inputs/README.md
@@ -52,9 +52,12 @@ jobs:
         env:
           AICTRL_BUILD_SINGLE: "true"
 
+      - name: Debug Dist
+        run: ls -R packages/cli/dist
+
       - name: Run Hush Review
         run: |
-          ./packages/cli/dist/aictrl-linux-x64-baseline-musl-lite/bin/aictrl run "Perform the code review as described in .inputs/TASK.md" --agent hush
+          ./packages/cli/dist/@aictrl/cli-linux-x64-baseline-musl-lite/bin/aictrl run "Perform the code review as described in .inputs/TASK.md" --agent hush
         env:
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
