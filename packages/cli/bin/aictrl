@@ -50,7 +50,7 @@ let arch = archMap[os.arch()]
 if (!arch) {
   arch = os.arch()
 }
-const base = "aictrl-" + platform + "-" + arch
+const base = "@aictrl/cli-" + platform + "-" + arch
 const binary = platform === "windows" ? "aictrl.exe" : "aictrl"
 
 function supportsAvx2() {
