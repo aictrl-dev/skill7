@@ -659,6 +659,10 @@ export namespace SessionPrompt {
         }
       } catch (e) {
         log.warn("failed to auto-load skills", { error: e })
+        Bus.publish(Session.Event.Error, {
+          sessionID,
+          error: new NamedError.Unknown({ message: "Failed to auto-load skills" }).toObject(),
+        })
       }
 
       const format = lastUser.format ?? { type: "text" }
