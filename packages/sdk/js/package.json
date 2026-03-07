@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@skill7-ai/sdk",
+  "name": "@aictrl/skill7-sdk",
   "version": "0.1.0",
   "description": "Official SDK for the Skill7 Headless AI Engine",
   "type": "module",

@@ -1,10 +1,10 @@
-import { FileDiff, Message, Model, Part, Session } from "@skill7-ai/sdk/v2"
-import { fn } from "@skill7-ai/util/fn"
-import { iife } from "@skill7-ai/util/iife"
-import { Identifier } from "@skill7-ai/util/identifier"
+import { FileDiff, Message, Model, Part, Session } from "@aictrl/sdk/v2"
+import { fn } from "@aictrl/util/fn"
+import { iife } from "@aictrl/util/iife"
+import { Identifier } from "@aictrl/util/identifier"
 import z from "zod"
 import { Storage } from "./storage"
-import { Binary } from "@skill7-ai/util/binary"
+import { Binary } from "@aictrl/util/binary"
 
 export namespace Share {
   export const Info = z.object({

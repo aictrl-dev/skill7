@@ -74,9 +74,9 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.933.0",
-    "@skill7-ai/plugin": "workspace:*",
+    "@aictrl/skill7-plugin": "workspace:*",
     "@skill7-ai/script": "workspace:*",
-    "@skill7-ai/sdk": "workspace:*",
+    "@aictrl/skill7-sdk": "workspace:*",
     "typescript": "catalog:"
   },
   "repository": {

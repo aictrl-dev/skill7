@@ -88,7 +88,7 @@ describe("tool.registry", () => {
           JSON.stringify({
             name: "custom-tools",
             dependencies: {
-              "@skill7-ai/plugin": "^0.0.0",
+              "@aictrl/plugin": "^0.0.0",
               cowsay: "^1.6.0",
             },
           }),

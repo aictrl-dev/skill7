@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { Script } from "@skill7-ai/script"
+import { Script } from "@aictrl/script"
 import { $ } from "bun"
 import { fileURLToPath } from "url"
 

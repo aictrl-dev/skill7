@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package",
-  "name": "@skill7-ai/script",
+  "name": "@aictrl/script",
   "license": "MIT",
   "devDependencies": {
     "@types/bun": "catalog:"

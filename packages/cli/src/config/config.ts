@@ -9,7 +9,7 @@ import { mergeDeep, pipe, unique } from "remeda"
 import { Global } from "../global"
 import fs from "fs/promises"
 import { lazy } from "../util/lazy"
-import { NamedError } from "@skill7-ai/util/error"
+import { NamedError } from "@aictrl/util/error"
 import { Flag } from "../flag/flag"
 import { Auth } from "../auth"
 import {
@@ -253,7 +253,7 @@ export namespace Config {
     }))
     json.dependencies = {
       ...json.dependencies,
-      "@skill7-ai/plugin": targetVersion,
+      "@aictrl/plugin": targetVersion,
     }
     await Filesystem.writeJson(pkg, json)
 
@@ -303,15 +303,15 @@ export namespace Config {
 
     const parsed = await Filesystem.readJson<{ dependencies?: Record<string, string> }>(pkg).catch(() => null)
     const dependencies = parsed?.dependencies ?? {}
-    const depVersion = dependencies["@skill7-ai/plugin"]
+    const depVersion = dependencies["@aictrl/plugin"]
     if (!depVersion) return true
 
     const targetVersion = Installation.isLocal() ? "latest" : Installation.VERSION
     if (targetVersion === "latest") {
-      const isOutdated = await PackageRegistry.isOutdated("@skill7-ai/plugin", depVersion, dir)
+      const isOutdated = await PackageRegistry.isOutdated("@aictrl/plugin", depVersion, dir)
       if (!isOutdated) return false
       log.info("Cached version is outdated, proceeding with install", {
-        pkg: "@skill7-ai/plugin",
+        pkg: "@aictrl/plugin",
         cachedVersion: depVersion,
       })
       return true

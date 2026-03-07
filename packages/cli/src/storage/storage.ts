@@ -6,7 +6,7 @@ import { Filesystem } from "../util/filesystem"
 import { lazy } from "../util/lazy"
 import { Lock } from "../util/lock"
 import { $ } from "bun"
-import { NamedError } from "@skill7-ai/util/error"
+import { NamedError } from "@aictrl/util/error"
 import z from "zod"
 import { Glob } from "../util/glob"
 

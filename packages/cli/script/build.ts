@@ -12,7 +12,7 @@ const dir = path.resolve(__dirname, "..")
 
 process.chdir(dir)
 
-import { Script } from "@skill7-ai/script"
+import { Script } from "@aictrl/script"
 import pkg from "../package.json"
 
 const modelsUrl = process.env.OPENCODE_MODELS_URL || "https://models.dev"

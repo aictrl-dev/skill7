@@ -1,4 +1,4 @@
-import { NamedError } from "@skill7-ai/util/error"
+import { NamedError } from "@aictrl/util/error"
 import matter from "gray-matter"
 import { z } from "zod"
 import { Filesystem } from "../util/filesystem"

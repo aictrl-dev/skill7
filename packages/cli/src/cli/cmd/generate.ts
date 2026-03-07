@@ -14,7 +14,7 @@ export const GenerateCommand = {
           {
             lang: "js",
             source: [
-              `import { createSkill7Client } from "@skill7-ai/sdk`,
+              `import { createSkill7Client } from "@aictrl/sdk`,
               ``,
               `const client = createSkill7Client()`,
               `await client.${operation.operationId}({`,

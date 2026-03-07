@@ -3,8 +3,8 @@ import { Plugin } from "../plugin"
 import { map, filter, pipe, fromEntries, mapValues } from "remeda"
 import z from "zod"
 import { fn } from "@/util/fn"
-import type { AuthOuathResult, Hooks } from "@skill7-ai/plugin"
-import { NamedError } from "@skill7-ai/util/error"
+import type { AuthOuathResult, Hooks } from "@aictrl/plugin"
+import { NamedError } from "@aictrl/util/error"
 import { Auth } from "@/auth"
 
 export namespace ProviderAuth {

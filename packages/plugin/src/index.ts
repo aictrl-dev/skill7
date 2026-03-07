@@ -10,7 +10,7 @@ import type {
   Part,
   Auth,
   Config,
-} from "@skill7-ai/sdk"
+} from "@aictrl/sdk"
 
 import type { BunShell } from "./shell"
 import { type ToolDefinition } from "./tool"

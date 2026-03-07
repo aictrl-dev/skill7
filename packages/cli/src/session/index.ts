@@ -1,4 +1,4 @@
-import { Slug } from "@skill7-ai/util/slug"
+import { Slug } from "@aictrl/util/slug"
 import path from "path"
 import { BusEvent } from "@/bus/bus-event"
 import { Bus } from "@/bus"

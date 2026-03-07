@@ -1,5 +1,5 @@
 import { AwsClient } from "aws4fetch"
-import { lazy } from "@skill7-ai/util/lazy"
+import { lazy } from "@aictrl/util/lazy"
 
 export namespace Storage {
   export interface Adapter {

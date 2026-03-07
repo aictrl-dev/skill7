@@ -5,7 +5,7 @@ import {
   formatPart,
   formatTranscript,
 } from "../../../src/cli/cmd/tui/util/transcript"
-import type { AssistantMessage, Part, UserMessage } from "@skill7-ai/sdk/v2"
+import type { AssistantMessage, Part, UserMessage } from "@aictrl/sdk/v2"
 
 describe("transcript", () => {
   describe("formatAssistantHeader", () => {
