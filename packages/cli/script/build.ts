@@ -15,7 +15,7 @@ process.chdir(dir)
 import { Script } from "@aictrl/script"
 import pkg from "../package.json"
 
-const modelsUrl = process.env.OPENCODE_MODELS_URL || "https://models.dev"
+const modelsUrl = process.env.AICTRL_MODELS_URL || "https://models.dev"
 // Fetch and generate models.dev snapshot
 const modelsData = process.env.MODELS_DEV_API_JSON
   ? await Bun.file(process.env.MODELS_DEV_API_JSON).text()
@@ -56,7 +56,7 @@ const migrations = await Promise.all(
 )
 console.log(`Loaded ${migrations.length} migrations`)
 
-const singleFlag = process.argv.includes("--single")
+const singleFlag = process.argv.includes("--single") || process.env.AICTRL_BUILD_SINGLE === "true"
 const baselineFlag = process.argv.includes("--baseline")
 const skipInstall = process.argv.includes("--skip-install")
 
@@ -172,16 +172,16 @@ for (const item of targets) {
       autoloadTsconfig: true,
       autoloadPackageJson: true,
       target: name.replace(pkg.name, "bun") as any,
-      outfile: `dist/${name}/bin/s7`,
+      outfile: `dist/${name}/bin/aictrl`,
       execArgv: [`--user-agent=aictrl/${Script.version}`, "--use-system-ca", "--"],
       windows: {},
     },
     entrypoints: ["./src/index.ts"],
     define: {
-      OPENCODE_VERSION: `'${Script.version}'`,
-      OPENCODE_MIGRATIONS: JSON.stringify(migrations),
-      OPENCODE_CHANNEL: `'${Script.channel}'`,
-      OPENCODE_LIBC: item.os === "linux" ? `'${item.abi ?? "glibc"}'` : "",
+      AICTRL_VERSION: `'${Script.version}'`,
+      AICTRL_MIGRATIONS: JSON.stringify(migrations),
+      AICTRL_CHANNEL: `'${Script.channel}'`,
+      AICTRL_LIBC: item.os === "linux" ? `'${item.abi ?? "glibc"}'` : "",
     },
   })
 

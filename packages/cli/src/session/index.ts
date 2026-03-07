@@ -22,7 +22,6 @@ import { SessionPrompt } from "./prompt"
 import { fn } from "@/util/fn"
 import { Command } from "../command"
 import { Snapshot } from "@/snapshot"
-import { WorkspaceContext } from "../control-plane/workspace-context"
 
 import type { Provider } from "@/provider/provider"
 import { PermissionNext } from "@/permission/next"
@@ -301,7 +300,6 @@ export namespace Session {
       version: Installation.VERSION,
       projectID: Instance.project.id,
       directory: input.directory,
-      workspaceID: WorkspaceContext.workspaceID,
       parentID: input.parentID,
       title: input.title ?? createDefaultTitle(!!input.parentID),
       permission: input.permission,
@@ -320,7 +318,7 @@ export namespace Session {
       )
     })
     const cfg = await Config.get()
-    if (!result.parentID && (Flag.OPENCODE_AUTO_SHARE || cfg.share === "auto"))
+    if (!result.parentID && cfg.share === "auto")
       share(result.id).catch(() => {
         // Silently ignore sharing errors during session creation
       })
@@ -541,9 +539,6 @@ export namespace Session {
     const project = Instance.project
     const conditions = [eq(SessionTable.project_id, project.id)]
 
-    if (WorkspaceContext.workspaceID) {
-      conditions.push(eq(SessionTable.workspace_id, WorkspaceContext.workspaceID))
-    }
     if (input?.directory) {
       conditions.push(eq(SessionTable.directory, input.directory))
     }

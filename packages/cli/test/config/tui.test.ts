@@ -7,11 +7,11 @@ import { TuiConfig } from "../../src/config/tui"
 import { Global } from "../../src/global"
 import { Filesystem } from "../../src/util/filesystem"
 
-const managedConfigDir = process.env.OPENCODE_TEST_MANAGED_CONFIG_DIR!
+const managedConfigDir = process.env.AICTRL_TEST_MANAGED_CONFIG_DIR!
 
 afterEach(async () => {
-  delete process.env.OPENCODE_CONFIG
-  delete process.env.OPENCODE_TUI_CONFIG
+  delete process.env.AICTRL_CONFIG
+  delete process.env.AICTRL_TUI_CONFIG
   await fs.rm(path.join(Global.Path.config, "tui.json"), { force: true }).catch(() => {})
   await fs.rm(path.join(Global.Path.config, "tui.jsonc"), { force: true }).catch(() => {})
   await fs.rm(managedConfigDir, { force: true, recursive: true }).catch(() => {})
@@ -322,28 +322,6 @@ test("top-level keys in tui.json take precedence over nested tui key", async () 
   })
 })
 
-test("project config takes precedence over OPENCODE_TUI_CONFIG (matches OPENCODE_CONFIG)", async () => {
-  await using tmp = await tmpdir({
-    init: async (dir) => {
-      await Bun.write(path.join(dir, "tui.json"), JSON.stringify({ theme: "project", diff_style: "auto" }))
-      const custom = path.join(dir, "custom-tui.json")
-      await Bun.write(custom, JSON.stringify({ theme: "custom", diff_style: "stacked" }))
-      process.env.OPENCODE_TUI_CONFIG = custom
-    },
-  })
-
-  await Instance.provide({
-    directory: tmp.path,
-    fn: async () => {
-      const config = await TuiConfig.get()
-      // project tui.json overrides the custom path, same as server config precedence
-      expect(config.theme).toBe("project")
-      // project also set diff_style, so that wins
-      expect(config.diff_style).toBe("auto")
-    },
-  })
-})
-
 test("merges keybind overrides across precedence layers", async () => {
   await using tmp = await tmpdir({
     init: async (dir) => {
@@ -362,33 +340,14 @@ test("merges keybind overrides across precedence layers", async () => {
   })
 })
 
-test("OPENCODE_TUI_CONFIG provides settings when no project config exists", async () => {
-  await using tmp = await tmpdir({
-    init: async (dir) => {
-      const custom = path.join(dir, "custom-tui.json")
-      await Bun.write(custom, JSON.stringify({ theme: "from-env", diff_style: "stacked" }))
-      process.env.OPENCODE_TUI_CONFIG = custom
-    },
-  })
-
-  await Instance.provide({
-    directory: tmp.path,
-    fn: async () => {
-      const config = await TuiConfig.get()
-      expect(config.theme).toBe("from-env")
-      expect(config.diff_style).toBe("stacked")
-    },
-  })
-})
-
-test("does not derive tui path from OPENCODE_CONFIG", async () => {
+test("does not derive tui path from AICTRL_CONFIG", async () => {
   await using tmp = await tmpdir({
     init: async (dir) => {
       const customDir = path.join(dir, "custom")
       await fs.mkdir(customDir, { recursive: true })
       await Bun.write(path.join(customDir, "aictrl.json"), JSON.stringify({ model: "test/model" }))
       await Bun.write(path.join(customDir, "tui.json"), JSON.stringify({ theme: "should-not-load" }))
-      process.env.OPENCODE_CONFIG = path.join(customDir, "aictrl.json")
+      process.env.AICTRL_CONFIG = path.join(customDir, "aictrl.json")
     },
   })
 

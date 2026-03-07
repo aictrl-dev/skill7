@@ -8,8 +8,8 @@ import { iife } from "@/util/iife"
 import { Flag } from "../flag/flag"
 
 declare global {
-  const OPENCODE_VERSION: string
-  const OPENCODE_CHANNEL: string
+  const AICTRL_VERSION: string
+  const AICTRL_CHANNEL: string
 }
 
 export namespace Installation {
@@ -104,7 +104,7 @@ export namespace Installation {
     for (const check of checks) {
       const output = await check.command()
       const installedName =
-        check.name === "brew" || check.name === "choco" || check.name === "scoop" ? "aictrl" : "aictrl-ai"
+        check.name === "brew" || check.name === "choco" || check.name === "scoop" ? "aictrl" : "@aictrl/cli"
       if (output.includes(installedName)) {
         return check.name
       }
@@ -138,13 +138,13 @@ export namespace Installation {
         })
         break
       case "npm":
-        cmd = $`npm install -g aictrl-ai@${target}`
+        cmd = $`npm install -g @aictrl/cli@${target}`
         break
       case "pnpm":
-        cmd = $`pnpm install -g aictrl-ai@${target}`
+        cmd = $`pnpm install -g @aictrl/cli@${target}`
         break
       case "bun":
-        cmd = $`bun install -g aictrl-ai@${target}`
+        cmd = $`bun install -g @aictrl/cli@${target}`
         break
       case "brew": {
         const formula = await getBrewFormula()
@@ -189,9 +189,9 @@ export namespace Installation {
     await $`${process.execPath} --version`.nothrow().quiet().text()
   }
 
-  export const VERSION = typeof OPENCODE_VERSION === "string" ? OPENCODE_VERSION : "local"
-  export const CHANNEL = typeof OPENCODE_CHANNEL === "string" ? OPENCODE_CHANNEL : "local"
-  export const USER_AGENT = `aictrl/${CHANNEL}/${VERSION}/${Flag.OPENCODE_CLIENT}`
+  export const VERSION = typeof AICTRL_VERSION === "string" ? AICTRL_VERSION : "local"
+  export const CHANNEL = typeof AICTRL_CHANNEL === "string" ? AICTRL_CHANNEL : "local"
+  export const USER_AGENT = `aictrl/${CHANNEL}/${VERSION}/${Flag.AICTRL_CLIENT}`
 
   export async function latest(installMethod?: Method) {
     const detectedMethod = installMethod || (await method())
@@ -220,7 +220,7 @@ export namespace Installation {
         return reg.endsWith("/") ? reg.slice(0, -1) : reg
       })
       const channel = CHANNEL
-      return fetch(`${registry}/aictrl-ai/${channel}`)
+      return fetch(`${registry}/@aictrl/cli/${channel}`)
         .then((res) => {
           if (!res.ok) throw new Error(res.statusText)
           return res.json()
