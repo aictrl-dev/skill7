@@ -46,6 +46,21 @@ jobs:
         working-directory: packages/cli/dist/@aictrl/cli-linux-x64
         run: npm publish --access public --provenance || true
 
+      - name: Strip bundled deps from CLI package.json
+        working-directory: packages/cli
+        run: |
+          # All dependencies are bundled into the compiled binary.
+          # Only optionalDependencies (platform binaries) are needed at install time.
+          node -e "
+            const pkg = require('./package.json');
+            delete pkg.dependencies;
+            delete pkg.devDependencies;
+            delete pkg.peerDependencies;
+            delete pkg.peerDependenciesMeta;
+            delete pkg.overrides;
+            require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+
       - name: Publish @aictrl/cli
         working-directory: packages/cli
         run: bun pm pack && npm publish *.tgz --access public --provenance
