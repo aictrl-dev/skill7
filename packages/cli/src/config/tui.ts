@@ -22,7 +22,7 @@ export namespace TuiConfig {
   }
 
   function customPath() {
-    return Flag.AICTRL_TUI_CONFIG
+    return undefined
   }
 
   const state = Instance.state(async () => {

@@ -222,7 +222,7 @@ export namespace Project {
       return fresh
     })
 
-    if (Flag.AICTRL_EXPERIMENTAL_ICON_DISCOVERY) discover(existing)
+    if (Flag.AICTRL_EXPERIMENTAL) discover(existing)
 
     const result: Info = {
       ...existing,

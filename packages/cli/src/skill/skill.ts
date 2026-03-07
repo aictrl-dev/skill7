@@ -103,20 +103,18 @@ export namespace Skill {
 
     // Scan external skill directories (.claude/skills/, .agents/skills/, etc.)
     // Load global (home) first, then project-level (so project-level overwrites)
-    if (!Flag.AICTRL_DISABLE_EXTERNAL_SKILLS) {
-      for (const dir of EXTERNAL_DIRS) {
-        const root = path.join(Global.Path.home, dir)
-        if (!(await Filesystem.isDir(root))) continue
-        await scanExternal(root, "global")
-      }
+    for (const dir of EXTERNAL_DIRS) {
+      const root = path.join(Global.Path.home, dir)
+      if (!(await Filesystem.isDir(root))) continue
+      await scanExternal(root, "global")
+    }
 
-      for await (const root of Filesystem.up({
-        targets: EXTERNAL_DIRS,
-        start: Instance.directory,
-        stop: Instance.worktree,
-      })) {
-        await scanExternal(root, "project")
-      }
+    for await (const root of Filesystem.up({
+      targets: EXTERNAL_DIRS,
+      start: Instance.directory,
+      stop: Instance.worktree,
+    })) {
+      await scanExternal(root, "project")
     }
 
     // Scan .aictrl/skill/ directories

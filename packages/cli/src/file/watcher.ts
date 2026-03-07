@@ -74,7 +74,7 @@ export namespace FileWatcher {
       const subs: ParcelWatcher.AsyncSubscription[] = []
       const cfgIgnores = cfg.watcher?.ignore ?? []
 
-      if (Flag.AICTRL_EXPERIMENTAL_FILEWATCHER) {
+      if (Flag.AICTRL_EXPERIMENTAL) {
         const pending = w.subscribe(Instance.directory, subscribe, {
           ignore: [...FileIgnore.PATTERNS, ...cfgIgnores],
           backend,
@@ -120,9 +120,6 @@ export namespace FileWatcher {
   )
 
   export function init() {
-    if (Flag.AICTRL_EXPERIMENTAL_DISABLE_FILEWATCHER) {
-      return
-    }
     state()
   }
 }
