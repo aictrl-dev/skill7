@@ -85,7 +85,7 @@ jobs:
 
       - name: Install Aictrl CLI
         if: steps.check_changes.outputs.skip != 'true'
-        run: npm install -g @aictrl/cli@latest
+        run: npm install @aictrl/cli@latest
 
       - name: Run Aictrl Review
         if: steps.check_changes.outputs.skip != 'true'
@@ -95,7 +95,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Starting review with zai-coding-plan/glm-5 for PR #$PR_NUMBER SHA $PR_SHA..."
-          aictrl --version || true
+          npx aictrl --version || true
           echo "ZHIPU_API_KEY length: ${#ZHIPU_API_KEY}"
 
-          aictrl run --format json --model zai-coding-plan/glm-5 "Say hello and confirm you are working."
+          npx aictrl run --format json --model zai-coding-plan/glm-5 "Say hello and confirm you are working."
