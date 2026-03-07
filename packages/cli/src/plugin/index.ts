@@ -2,8 +2,7 @@ import type { Hooks, PluginInput, Plugin as PluginInstance } from "@aictrl/plugi
 import { Config } from "../config/config"
 import { Bus } from "../bus"
 import { Log } from "../util/log"
-import { createSkill7Client } from "@aictrl/sdk"
-import { Server } from "../server/server"
+import { createSkill7Client } from "@aictrl/skill7-sdk"
 import { BunProc } from "../bun"
 import { Instance } from "../project/instance"
 import { Flag } from "../flag/flag"
@@ -11,7 +10,6 @@ import { CodexAuthPlugin } from "./codex"
 import { Session } from "../session"
 import { NamedError } from "@aictrl/util/error"
 import { CopilotAuthPlugin } from "./copilot"
-import { gitlabAuthPlugin as GitlabAuthPlugin } from "@gitlab/skill7-gitlab-auth"
 
 export namespace Plugin {
   const log = Log.create({ service: "plugin" })
@@ -19,14 +17,13 @@ export namespace Plugin {
   const BUILTIN = ["skill7-anthropic-auth@0.0.13"]
 
   // Built-in plugins that are directly imported (not installed from npm)
-  const INTERNAL_PLUGINS: PluginInstance[] = [CodexAuthPlugin, CopilotAuthPlugin, GitlabAuthPlugin]
+  const INTERNAL_PLUGINS: PluginInstance[] = [CodexAuthPlugin, CopilotAuthPlugin]
 
   const state = Instance.state(async () => {
     const client = createSkill7Client({
       baseUrl: "http://localhost:4096",
       directory: Instance.directory,
       // @ts-ignore - fetch type incompatibility
-      fetch: async (...args) => Server.App().fetch(...args),
     })
     const config = await Config.get()
     const hooks: Hooks[] = []
@@ -35,7 +32,6 @@ export namespace Plugin {
       project: Instance.project,
       worktree: Instance.worktree,
       directory: Instance.directory,
-      serverUrl: Server.url(),
       $: Bun.$,
     }
 

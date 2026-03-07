@@ -1,5 +1,4 @@
 import { Hono } from "hono"
-import { SessionRoutes } from "../../server/routes/session"
 import { WorkspaceServerRoutes } from "./routes"
 
 export namespace WorkspaceServer {

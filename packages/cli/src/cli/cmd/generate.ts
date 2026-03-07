@@ -1,29 +1,15 @@
-import { Server } from "../../server/server"
 import type { CommandModule } from "yargs"
 
 export const GenerateCommand = {
   command: "generate",
   handler: async () => {
-    const specs = await Server.openapi()
-    for (const item of Object.values(specs.paths)) {
-      for (const method of ["get", "post", "put", "delete", "patch"] as const) {
-        const operation = item[method]
-        if (!operation?.operationId) continue
-        // @ts-expect-error
-        operation["x-codeSamples"] = [
-          {
-            lang: "js",
-            source: [
-              `import { createSkill7Client } from "@aictrl/sdk`,
-              ``,
-              `const client = createSkill7Client()`,
-              `await client.${operation.operationId}({`,
-              `  ...`,
-              `})`,
-            ].join("\n"),
-          },
-        ]
-      }
+    const specs = {
+      openapi: "3.1.1",
+      info: {
+        title: "skill7",
+        version: "1.0.0",
+      },
+      paths: {},
     }
     const json = JSON.stringify(specs, null, 2)
 

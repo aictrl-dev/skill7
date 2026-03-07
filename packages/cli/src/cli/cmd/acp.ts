@@ -3,8 +3,7 @@ import { bootstrap } from "../bootstrap"
 import { cmd } from "./cmd"
 import { AgentSideConnection, ndJsonStream } from "@agentclientprotocol/sdk"
 import { ACP } from "@/acp/agent"
-import { Server } from "@/server/server"
-import { createSkill7Client } from "@aictrl/sdk/v2"
+import { createSkill7Client } from "@aictrl/skill7-sdk/v2"
 import { withNetworkOptions, resolveNetworkOptions } from "../network"
 
 const log = Log.create({ service: "acp-command" })
@@ -23,7 +22,6 @@ export const AcpCommand = cmd({
     process.env.OPENCODE_CLIENT = "acp"
     await bootstrap(process.cwd(), async () => {
       const opts = await resolveNetworkOptions(args)
-      const server = Server.listen(opts)
 
       const sdk = createSkill7Client({
         baseUrl: `http://${server.hostname}:${server.port}`,

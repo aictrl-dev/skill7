@@ -7,8 +7,7 @@ import { Flag } from "../../flag/flag"
 import { bootstrap } from "../bootstrap"
 import { EOL } from "os"
 import { Filesystem } from "../../util/filesystem"
-import { createSkill7Client, type Message, type OpencodeClient, type ToolPart } from "@aictrl/sdk/v2"
-import { Server } from "../../server/server"
+import { createSkill7Client, type Message, type OpencodeClient, type ToolPart } from "@aictrl/skill7-sdk/v2"
 import { Provider } from "../../provider/provider"
 import { Agent } from "../../agent/agent"
 import { PermissionNext } from "../../permission/next"
@@ -616,7 +615,6 @@ export const RunCommand = cmd({
     await bootstrap(process.cwd(), async () => {
       const fetchFn = (async (input: RequestInfo | URL, init?: RequestInit) => {
         const request = new Request(input, init)
-        return Server.App().fetch(request)
       }) as typeof globalThis.fetch
       const sdk = createSkill7Client({ baseUrl: "http://skill7.internal", fetch: fetchFn })
       await execute(sdk)

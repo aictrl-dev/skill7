@@ -1,6 +1,6 @@
 import type {
   Event,
-  createOpencodeClient,
+  createSkill7Client,
   Project,
   Model,
   Provider,
@@ -10,7 +10,7 @@ import type {
   Part,
   Auth,
   Config,
-} from "@aictrl/sdk"
+} from "@aictrl/skill7-sdk"
 
 import type { BunShell } from "./shell"
 import { type ToolDefinition } from "./tool"
@@ -24,7 +24,7 @@ export type ProviderContext = {
 }
 
 export type PluginInput = {
-  client: ReturnType<typeof createOpencodeClient>
+  client: ReturnType<typeof createSkill7Client>
   project: Project
   directory: string
   worktree: string
