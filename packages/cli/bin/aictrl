@@ -182,9 +182,9 @@ if (fs.existsSync(bunEntry)) {
   if (result.error) {
     if (result.error.code === "ENOENT") {
       console.error(
-        "No compiled binary found for your platform and Bun is not installed.\\n" +
+        "No compiled binary found for your platform and Bun is not installed.\n" +
           "Either install Bun (https://bun.sh) or install the platform package: " +
-          names.map((n) => `\"${n}\"`).join(" or "),
+          names.map((n) => `"${n}"`).join(" or "),
       )
     } else {
       console.error(result.error.message)
@@ -196,7 +196,7 @@ if (fs.existsSync(bunEntry)) {
 
 console.error(
   "It seems that your package manager failed to install the right version of the aictrl CLI for your platform. You can try manually installing " +
-    names.map((n) => `\"${n}\"`).join(" or ") +
+    names.map((n) => `"${n}"`).join(" or ") +
     " package, or install Bun (https://bun.sh) to run from source.",
 )
 process.exit(1)
