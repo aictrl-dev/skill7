@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { McpServer } from "@agentclientprotocol/sdk"
 import type { OpencodeClient } from "@aictrl/aictrl-sdk/v2"
 

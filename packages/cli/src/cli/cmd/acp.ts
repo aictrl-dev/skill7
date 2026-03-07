@@ -24,7 +24,6 @@ export const AcpCommand = cmd({
       const opts = await resolveNetworkOptions(args)
 
       const sdk = createAictrlClient({
-        baseUrl: `http://${server.hostname}:${server.port}`,
       })
 
       const input = new WritableStream<Uint8Array>({

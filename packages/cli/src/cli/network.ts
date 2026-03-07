@@ -44,15 +44,15 @@ export async function resolveNetworkOptions(args: NetworkOptions) {
   const mdnsDomainExplicitlySet = process.argv.includes("--mdns-domain")
   const corsExplicitlySet = process.argv.includes("--cors")
 
-  const mdns = mdnsExplicitlySet ? args.mdns : (config?.server?.mdns ?? args.mdns)
-  const mdnsDomain = mdnsDomainExplicitlySet ? args["mdns-domain"] : (config?.server?.mdnsDomain ?? args["mdns-domain"])
-  const port = portExplicitlySet ? args.port : (config?.server?.port ?? args.port)
+  const mdns = mdnsExplicitlySet ? args.mdns : args.mdns
+  const mdnsDomain = mdnsDomainExplicitlySet ? args["mdns-domain"] : args["mdns-domain"]
+  const port = portExplicitlySet ? args.port : args.port
   const hostname = hostnameExplicitlySet
     ? args.hostname
-    : mdns && !config?.server?.hostname
+    : mdns
       ? "0.0.0.0"
-      : (config?.server?.hostname ?? args.hostname)
-  const configCors = config?.server?.cors ?? []
+      : args.hostname
+  const configCors: string[] = []
   const argsCors = Array.isArray(args.cors) ? args.cors : args.cors ? [args.cors] : []
   const cors = [...configCors, ...argsCors]
 

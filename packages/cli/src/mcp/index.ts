@@ -406,7 +406,6 @@ export namespace MCP {
                 error: "Server does not support dynamic client registration. Please provide clientId in config.",
               }
               // Show toast for needs_client_registration
-              Bus.publish(TuiEvent.ToastShow, {
                 title: "MCP Authentication Required",
                 message: `Server "${key}" requires a pre-registered client ID. Add clientId to your config.`,
                 variant: "warning",
@@ -417,7 +416,6 @@ export namespace MCP {
               pendingOAuthTransports.set(key, transport)
               status = { status: "needs_auth" as const }
               // Show toast for needs_auth
-              Bus.publish(TuiEvent.ToastShow, {
                 title: "MCP Authentication Required",
                 message: `Server "${key}" requires authentication. Run: aictrl mcp auth ${key}`,
                 variant: "warning",

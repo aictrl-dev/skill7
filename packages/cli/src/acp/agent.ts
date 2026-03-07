@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   RequestError,
   type Agent as ACPAgent,

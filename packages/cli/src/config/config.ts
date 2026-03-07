@@ -1385,7 +1385,7 @@ export namespace Config {
         GlobalBus.emit("event", {
           directory: "global",
           payload: {
-            type: Event.Disposed.type,
+            type: "server.instance.disposed",
             properties: {},
           },
         })

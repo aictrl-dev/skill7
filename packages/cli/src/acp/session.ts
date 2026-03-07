@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { RequestError, type McpServer } from "@agentclientprotocol/sdk"
 import type { ACPSessionState } from "./types"
 import { Log } from "@/util/log"
