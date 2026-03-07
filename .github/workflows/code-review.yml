@@ -112,3 +112,7 @@ jobs:
           Do NOT try to auto-detect the PR number — use exactly $PR_NUMBER.
 
           **CRITICAL**: Include the string 'Reviewed SHA: $PR_SHA' at the very end of your comment so we can track which commits have been reviewed."
+
+      - name: Print debug log on failure
+        if: failure()
+        run: cat ~/.local/share/aictrl/log/dev.log 2>/dev/null || echo "No log file found"
