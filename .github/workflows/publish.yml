@@ -40,6 +40,10 @@ jobs:
         run: npx npm publish --access public --provenance
         working-directory: packages/sdk
 
+      - name: Publish @aictrl/cli-linux-x64
+        run: npx npm publish --access public --provenance
+        working-directory: packages/cli/dist/@aictrl/cli-linux-x64
+
       - name: Publish @aictrl/cli
         run: npx npm publish --access public --provenance
         working-directory: packages/cli
