@@ -57,7 +57,7 @@ jobs:
 
       - name: Run Hush Review
         run: |
-          ./packages/cli/dist/@aictrl/cli-linux-x64-baseline-musl-lite/bin/aictrl run "Perform the code review as described in .inputs/TASK.md" --agent hush
+          ./packages/cli/dist/@aictrl/cli-linux-x64-lite/bin/aictrl run "Perform the code review as described in .inputs/TASK.md" --agent hush
         env:
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
