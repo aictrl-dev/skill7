@@ -1,9 +1,12 @@
 {
   "name": "@aictrl/util",
   "version": "1.2.15",
-  "private": true,
+  "private": false,
   "type": "module",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     "./*": "./src/*.ts"
   },
