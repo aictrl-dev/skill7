@@ -34,9 +34,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ -z "$PR_NUMBER" ]; then
-            echo "Not a pull request, proceeding."
-            echo "skip=false" >> $GITHUB_OUTPUT
-            exit 0
+            # workflow_dispatch: try to find the PR for this branch
+            BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+            PR_NUMBER=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number' 2>/dev/null || true)
+            if [ -z "$PR_NUMBER" ]; then
+              echo "No PR found for branch $BRANCH. Skipping."
+              echo "skip=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            echo "Found PR #$PR_NUMBER for branch $BRANCH"
+            echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
           fi
 
           # 1. Check if this SHA was already reviewed
@@ -75,6 +82,9 @@ jobs:
         run: |
           curl -fsSL https://opencode.ai/install | bash -s -- --no-modify-path
           echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+
+          # Remove aictrl-specific tools that depend on @aictrl/plugin
+          rm -f .opencode/tool/*.ts
 
       - name: Run OpenCode Review
         if: steps.check_changes.outputs.skip != 'true'
