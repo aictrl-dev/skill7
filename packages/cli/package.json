@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "name": "@aictrl/cli",
   "description": "Headless execution engine for AI agent skills",
   "type": "module",
@@ -135,7 +135,7 @@
     "zod-to-json-schema": "3.24.5"
   },
   "optionalDependencies": {
-    "@aictrl/cli-linux-x64": "0.1.1"
+    "@aictrl/cli-linux-x64": "0.1.3"
   },
   "overrides": {
     "drizzle-orm": "1.0.0-beta.12-a5629fb"
