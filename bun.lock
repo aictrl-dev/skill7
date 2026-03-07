@@ -25,7 +25,7 @@
     },
     "packages/cli": {
       "name": "@aictrl/cli",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "bin": {
         "aictrl": "./bin/aictrl",
       },
@@ -134,7 +134,7 @@
     },
     "packages/plugin": {
       "name": "@aictrl/plugin",
-      "version": "0.1.0",
+      "version": "1.2.16",
       "dependencies": {
         "@aictrl/sdk": "workspace:*",
         "zod": "catalog:",
@@ -148,14 +148,14 @@
     },
     "packages/script": {
       "name": "@aictrl/script",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "devDependencies": {
         "@types/bun": "catalog:",
       },
     },
     "packages/sdk": {
       "name": "@aictrl/sdk",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "devDependencies": {
         "@hey-api/openapi-ts": "0.90.10",
         "@tsconfig/node22": "catalog:",
@@ -166,7 +166,7 @@
     },
     "packages/util": {
       "name": "@aictrl/util",
-      "version": "0.1.0",
+      "version": "1.2.16",
       "dependencies": {
         "zod": "catalog:",
       },

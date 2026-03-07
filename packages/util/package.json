@@ -4,6 +4,10 @@
   "private": false,
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aictrl-dev/cli"
+  },
   "publishConfig": {
     "access": "public"
   },

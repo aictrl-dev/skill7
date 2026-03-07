@@ -11,7 +11,7 @@
   "homepage": "https://aictrl.ai",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aictrl-dev/aictrl"
+    "url": "https://github.com/aictrl-dev/cli"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
