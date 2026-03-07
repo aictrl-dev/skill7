@@ -24,7 +24,9 @@ jobs:
           git config --global user.name "Aictrl CI"
 
       - name: Build
-        run: bun turbo build -- --single
+        run: bun turbo build
+        env:
+          AICTRL_BUILD_SINGLE: "true"
 
       - name: Typecheck
         run: bun run typecheck
