@@ -1,0 +1,64 @@
+name: Hush AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get PR Diff
+        id: diff
+        run: |
+          git diff origin/${{ github.base_ref }}...HEAD > pr_diff.txt
+          echo "diff_path=$(pwd)/pr_diff.txt" >> $GITHUB_OUTPUT
+
+      - name: Setup Headless Inputs
+        run: |
+          mkdir -p .inputs .outputs
+          echo "# Task: Code Review" > .inputs/TASK.md
+          echo "Please review the following PR changes. Post your findings as comments on the PR." >> .inputs/TASK.md
+          echo "## PR Context" >> .inputs/TASK.md
+          echo "PR Number: ${{ github.event.pull_request.number }}" >> .inputs/TASK.md
+          echo "Base Ref: ${{ github.base_ref }}" >> .inputs/TASK.md
+          echo "## Diff" >> .inputs/TASK.md
+          echo "```diff" >> .inputs/TASK.md
+          cat pr_diff.txt >> .inputs/TASK.md
+          echo "```" >> .inputs/TASK.md
+          
+          echo "# Inputs README" > .inputs/README.md
+          echo "TASK.md contains the PR diff and metadata." >> .inputs/README.md
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build Lite Binary
+        run: |
+          cd packages/cli
+          bun run script/build.ts --single --baseline --lite
+        env:
+          AICTRL_BUILD_SINGLE: "true"
+
+      - name: Run Hush Review
+        run: |
+          ./packages/cli/dist/aictrl-linux-x64-baseline-musl-lite/bin/aictrl run "Perform the code review as described in .inputs/TASK.md" --agent hush
+        env:
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_OWNER: ${{ github.repository_owner }}
+          GH_REPO: ${{ github.event.repository.name }}
+          AICTRL_HEADLESS: "true"
