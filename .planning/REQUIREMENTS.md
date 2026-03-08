@@ -68,34 +68,34 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| PROC-01 | — | Pending |
-| PROC-02 | — | Pending |
-| PROC-03 | — | Pending |
-| PROC-04 | — | Pending |
-| PROC-05 | — | Pending |
-| SEC-01 | — | Pending |
-| SEC-02 | — | Pending |
-| SEC-03 | — | Pending |
-| SEC-04 | — | Pending |
-| SEC-05 | — | Pending |
-| RES-01 | — | Pending |
-| RES-02 | — | Pending |
-| RES-03 | — | Pending |
-| RES-04 | — | Pending |
-| SESS-01 | — | Pending |
-| SESS-02 | — | Pending |
-| SESS-03 | — | Pending |
-| SESS-04 | — | Pending |
-| SESS-05 | — | Pending |
-| SESS-06 | — | Pending |
-| DATA-01 | — | Pending |
-| DATA-02 | — | Pending |
-| DATA-03 | — | Pending |
-| DATA-04 | — | Pending |
-| DATA-05 | — | Pending |
-| OPS-01 | — | Pending |
-| OPS-02 | — | Pending |
-| OPS-03 | — | Pending |
-| OPS-04 | — | Pending |
-| OPS-05 | — | Pending |
-| OPS-06 | — | Pending |
+| PROC-01 | Phase 01 | Pending |
+| PROC-02 | Phase 01 | Pending |
+| PROC-03 | Phase 02 | Pending |
+| PROC-04 | Phase 02 | Pending |
+| PROC-05 | Phase 02 | Pending |
+| SEC-01 | Phase 03 | Pending |
+| SEC-02 | Phase 03 | Pending |
+| SEC-03 | Phase 04 | Pending |
+| SEC-04 | Phase 03 | Pending |
+| SEC-05 | Phase 03 | Pending |
+| RES-01 | Phase 04 | Pending |
+| RES-02 | Phase 05 | Pending |
+| RES-03 | Phase 05 | Pending |
+| RES-04 | Phase 05 | Pending |
+| SESS-01 | Phase 06 | Pending |
+| SESS-02 | Phase 06 | Pending |
+| SESS-03 | Phase 07 | Pending |
+| SESS-04 | Phase 07 | Pending |
+| SESS-05 | Phase 06 | Pending |
+| SESS-06 | Phase 06 | Pending |
+| DATA-01 | Phase 08 | Pending |
+| DATA-02 | Phase 08 | Pending |
+| DATA-03 | Phase 08 | Pending |
+| DATA-04 | Phase 08 | Pending |
+| DATA-05 | Phase 09 | Pending |
+| OPS-01 | Phase 10 | Pending |
+| OPS-02 | Phase 10 | Pending |
+| OPS-03 | Phase 10 | Pending |
+| OPS-04 | Phase 10 | Pending |
+| OPS-05 | Phase 07 | Pending |
+| OPS-06 | Phase 09 | Pending |
