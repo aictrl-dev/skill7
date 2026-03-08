@@ -28,11 +28,11 @@
   2. When an uncaught exception occurs, the process logs the full stack trace and exits with code 1 (not just logs and continues)
   3. No `.catch(() => {})` patterns remain in the `aictrl run` critical path
   4. A regression test confirms that a simulated prompt failure causes `aictrl run` to exit non-zero
-**Plans:** TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 01-01: Fix fire-and-forget error swallowing in run.ts
-- [ ] 01-02: Fix uncaughtException handler to exit cleanly
+- [ ] 01-01-PLAN.md -- Fix fire-and-forget error swallowing in run.ts (PROC-01)
+- [ ] 01-02-PLAN.md -- Fix uncaughtException/unhandledRejection handlers to exit cleanly (PROC-02)
 
 ### Phase 02: Instance Lifecycle
 **Goal:** Instance bootstrap, initialization, and disposal handle failures gracefully without poisoning cached state or masking original errors
@@ -184,7 +184,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 01. Process Exit Path | 0/2 | Not started | - |
+| 01. Process Exit Path | 0/2 | Planned | - |
 | 02. Instance Lifecycle | 0/3 | Not started | - |
 | 03. Input Sanitization & Security | 0/4 | Not started | - |
 | 04. Shell Execution Safety | 0/2 | Not started | - |
