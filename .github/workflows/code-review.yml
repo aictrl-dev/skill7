@@ -85,7 +85,13 @@ jobs:
 
       - name: Install Aictrl CLI
         if: steps.check_changes.outputs.skip != 'true'
-        run: npm install @aictrl/cli@latest
+        run: |
+          # Install in isolated dir to avoid monorepo package.json with catalog: protocol
+          mkdir -p "$RUNNER_TEMP/aictrl"
+          cd "$RUNNER_TEMP/aictrl"
+          npm init -y > /dev/null 2>&1
+          npm install @aictrl/cli@latest
+          echo "$RUNNER_TEMP/aictrl/node_modules/.bin" >> $GITHUB_PATH
 
       - name: Run Aictrl Review
         if: steps.check_changes.outputs.skip != 'true'
@@ -95,7 +101,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Starting review with zai-coding-plan/glm-5 for PR #$PR_NUMBER SHA $PR_SHA..."
-          npx aictrl --version || true
+          aictrl --version || true
           echo "ZHIPU_API_KEY length: ${#ZHIPU_API_KEY}"
 
-          npx aictrl run --format json --model zai-coding-plan/glm-5 "Say hello and confirm you are working."
+          # Run with debug logging printed to stderr for diagnostics
+          aictrl run --print-logs --log-level DEBUG --format json --model zai-coding-plan/glm-5 "Say hello and confirm you are working." 2>&1 || {
+            EXIT_CODE=$?
+            echo "aictrl exited with code $EXIT_CODE"
+            exit $EXIT_CODE
+          }
