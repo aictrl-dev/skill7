@@ -93,6 +93,16 @@ jobs:
           npm install @aictrl/cli@latest
           echo "$RUNNER_TEMP/aictrl/node_modules/.bin" >> $GITHUB_PATH
 
+      - name: Generate PR Diff
+        if: steps.check_changes.outputs.skip != 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get the full diff and PR metadata for the review prompt
+          gh pr diff "$PR_NUMBER" > "$RUNNER_TEMP/pr-diff.txt"
+          gh pr view "$PR_NUMBER" --json title,body --jq '"# \(.title)\n\n\(.body)"' > "$RUNNER_TEMP/pr-info.txt"
+          echo "Diff size: $(wc -l < "$RUNNER_TEMP/pr-diff.txt") lines"
+
       - name: Run Aictrl Review
         if: steps.check_changes.outputs.skip != 'true'
         timeout-minutes: 15
@@ -102,12 +112,23 @@ jobs:
         run: |
           echo "Starting review for PR #$PR_NUMBER (SHA $PR_SHA)..."
 
+          PR_INFO=$(cat "$RUNNER_TEMP/pr-info.txt")
+          PR_DIFF=$(cat "$RUNNER_TEMP/pr-diff.txt")
+
           # Run from a clean temp dir to avoid the monorepo's config affecting session
           cd "$RUNNER_TEMP"
           aictrl run --format json --model zai-coding-plan/glm-5 \
-            "Review the changes in PR #$PR_NUMBER for the aictrl CLI.
+            "Review the following PR changes for the aictrl CLI.
 
-          **IMPORTANT**: This is a code review only. Do NOT run tests, npm commands, or build commands. Only read source files and git diffs.
+          ## PR Info
+          $PR_INFO
+
+          ## Diff
+          \`\`\`diff
+          $PR_DIFF
+          \`\`\`
+
+          **IMPORTANT**: This is a code review only. Do NOT run tests, npm commands, or build commands. Do NOT try to read local files — all changes are provided above.
 
           Focus areas:
           1. **Code Quality**: Look for bugs, logic errors, and maintainability issues.
