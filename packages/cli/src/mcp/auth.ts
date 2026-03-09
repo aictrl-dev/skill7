@@ -2,6 +2,7 @@ import path from "path"
 import z from "zod"
 import { Global } from "../global"
 import { Filesystem } from "../util/filesystem"
+import { Lock } from "../util/lock"
 
 export namespace McpAuth {
   export const Tokens = z.object({
@@ -29,6 +30,7 @@ export namespace McpAuth {
   })
   export type Entry = z.infer<typeof Entry>
 
+  const LOCK_KEY = "mcp-auth-json"
   const filepath = path.join(Global.Path.data, "mcp-auth.json")
 
   export async function get(mcpName: string): Promise<Entry | undefined> {
@@ -58,6 +60,7 @@ export namespace McpAuth {
   }
 
   export async function set(mcpName: string, entry: Entry, serverUrl?: string): Promise<void> {
+    using _ = await Lock.write(LOCK_KEY)
     const data = await all()
     // Always update serverUrl if provided
     if (serverUrl) {
@@ -67,6 +70,7 @@ export namespace McpAuth {
   }
 
   export async function remove(mcpName: string): Promise<void> {
+    using _ = await Lock.write(LOCK_KEY)
     const data = await all()
     delete data[mcpName]
     await Filesystem.writeJson(filepath, data, 0o600)

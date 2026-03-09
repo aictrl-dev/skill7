@@ -1,4 +1,4 @@
-import { chmod, mkdir, readFile, writeFile } from "fs/promises"
+import { chmod, mkdir, readFile, realpath, writeFile } from "fs/promises"
 import { createWriteStream, existsSync, statSync } from "fs"
 import { lookup } from "mime-types"
 import { realpathSync } from "fs"
@@ -133,6 +133,19 @@ export namespace Filesystem {
 
   export function contains(parent: string, child: string) {
     return !relative(parent, child).startsWith("..")
+  }
+
+  export async function containsSafe(parent: string, child: string): Promise<boolean> {
+    try {
+      const realParent = await realpath(parent)
+      const realChild = await realpath(child)
+      return !relative(realParent, realChild).startsWith("..")
+    } catch {
+      // ENOENT: path doesn't exist on disk -- fall back to lexical check.
+      // This is safe because symlinks can only escape if the path actually
+      // resolves through an existing symlink. Non-existent paths are fine.
+      return !relative(parent, child).startsWith("..")
+    }
   }
 
   export async function findUp(target: string, start: string, stop?: string) {

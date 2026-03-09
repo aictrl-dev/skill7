@@ -18,6 +18,7 @@ import { BashArity } from "@/permission/arity"
 import { Truncate } from "./truncation"
 import { Plugin } from "@/plugin"
 
+export const MAX_OUTPUT_BUFFER = 2 * 1024 * 1024 // 2MB, matching PTY module precedent
 const MAX_METADATA_LENGTH = 30_000
 const DEFAULT_TIMEOUT = Flag.AICTRL_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS || 2 * 60 * 1000
 
@@ -51,6 +52,29 @@ const parser = lazy(async () => {
   return p
 })
 
+const SHELL_INTERPRETERS = new Set(["bash", "sh", "zsh", "dash", "ksh", "fish"])
+
+function isShellInterpreter(commandName: string): boolean {
+  // Handle both bare names and full paths (e.g., /bin/bash, /usr/bin/env bash)
+  const base = commandName.split("/").pop() || ""
+  return SHELL_INTERPRETERS.has(base)
+}
+
+async function extractEmbeddedCommands(
+  shellContent: string,
+  parserInstance: Awaited<ReturnType<typeof parser>>,
+): Promise<string[]> {
+  const embeddedTree = parserInstance.parse(shellContent)
+  if (!embeddedTree) return []
+  const commands: string[] = []
+  for (const node of embeddedTree.rootNode.descendantsOfType("command")) {
+    if (!node) continue
+    const commandText = node.parent?.type === "redirected_statement" ? node.parent.text : node.text
+    commands.push(commandText)
+  }
+  return commands
+}
+
 // TODO: we may wanna rename this tool so it works better on other shells
 export const BashTool = Tool.define("bash", async () => {
   const shell = Shell.acceptable()
@@ -81,12 +105,13 @@ export const BashTool = Tool.define("bash", async () => {
         throw new Error(`Invalid timeout value: ${params.timeout}. Timeout must be a positive number.`)
       }
       const timeout = params.timeout ?? DEFAULT_TIMEOUT
-      const tree = await parser().then((p) => p.parse(params.command))
+      const p = await parser()
+      const tree = p.parse(params.command)
       if (!tree) {
         throw new Error("Failed to parse command")
       }
       const directories = new Set<string>()
-      if (!Instance.containsPath(cwd)) directories.add(cwd)
+      if (!(await Instance.containsPath(cwd))) directories.add(cwd)
       const patterns = new Set<string>()
       const always = new Set<string>()
 
@@ -126,7 +151,7 @@ export const BashTool = Tool.define("bash", async () => {
             if (resolved) {
               const normalized =
                 process.platform === "win32" ? Filesystem.windowsPath(resolved).replace(/\//g, "\\") : resolved
-              if (!Instance.containsPath(normalized)) {
+              if (!(await Instance.containsPath(normalized))) {
                 const dir = (await Filesystem.isDir(normalized)) ? normalized : path.dirname(normalized)
                 directories.add(dir)
               }
@@ -138,6 +163,86 @@ export const BashTool = Tool.define("bash", async () => {
         if (command.length && command[0] !== "cd") {
           patterns.add(commandText)
           always.add(BashArity.prefix(command).join(" ") + " *")
+        }
+      }
+
+      // Detect shell interpreter bypass patterns:
+      // Pattern 1: heredoc to interpreter (bash << EOF\nrm -rf /\nEOF)
+      // Pattern 2: string arg to interpreter (bash -c 'rm -rf /', eval "rm -rf /")
+      for (const node of tree.rootNode.descendantsOfType("command")) {
+        if (!node) continue
+
+        const tokens: string[] = []
+        for (let i = 0; i < node.childCount; i++) {
+          const child = node.child(i)
+          if (!child) continue
+          if (
+            child.type === "command_name" ||
+            child.type === "word" ||
+            child.type === "string" ||
+            child.type === "raw_string" ||
+            child.type === "concatenation"
+          )
+            tokens.push(child.text)
+        }
+        if (tokens.length === 0) continue
+
+        const commandName = tokens[0]
+        const isInterpreter = isShellInterpreter(commandName) || commandName === "eval"
+
+        if (!isInterpreter) continue
+
+        // Pattern 1: Heredoc to interpreter
+        if (node.parent?.type === "redirected_statement") {
+          for (let i = 0; i < node.parent.childCount; i++) {
+            const sibling = node.parent.child(i)
+            if (sibling?.type === "heredoc_redirect") {
+              // heredoc_body is a child of heredoc_redirect
+              for (let j = 0; j < sibling.childCount; j++) {
+                const bodyNode = sibling.child(j)
+                if (bodyNode?.type === "heredoc_body") {
+                  const heredocContent = bodyNode.text
+                  // Remove trailing newline that precedes the delimiter
+                  const lines = heredocContent.split("\n")
+                  const content = lines.slice(0, -1).join("\n")
+                  if (content.trim()) {
+                    const embeddedCommands = await extractEmbeddedCommands(content, p)
+                    for (const cmd of embeddedCommands) {
+                      patterns.add(cmd)
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Pattern 2: String argument to interpreter (bash -c 'cmd', eval "cmd")
+        for (let i = 1; i < tokens.length; i++) {
+          const token = tokens[i]
+          if (token.startsWith("-") && token !== "-c") continue
+
+          if (commandName === "eval") {
+            if (!token.startsWith("-")) {
+              const unquoted = token.replace(/^['"]|['"]$/g, "")
+              if (unquoted.trim()) {
+                const embeddedCommands = await extractEmbeddedCommands(unquoted, p)
+                for (const cmd of embeddedCommands) {
+                  patterns.add(cmd)
+                }
+              }
+            }
+          } else if (token === "-c" && i + 1 < tokens.length) {
+            const cmdString = tokens[i + 1]
+            const unquoted = cmdString.replace(/^['"]|['"]$/g, "")
+            if (unquoted.trim()) {
+              const embeddedCommands = await extractEmbeddedCommands(unquoted, p)
+              for (const cmd of embeddedCommands) {
+                patterns.add(cmd)
+              }
+            }
+            break
+          }
         }
       }
 
@@ -181,6 +286,7 @@ export const BashTool = Tool.define("bash", async () => {
       })
 
       let output = ""
+      let truncatedBytes = 0
 
       // Initialize metadata with empty output
       ctx.metadata({
@@ -192,6 +298,14 @@ export const BashTool = Tool.define("bash", async () => {
 
       const append = (chunk: Buffer) => {
         output += chunk.toString()
+
+        // Cap buffer to prevent OOM on unbounded output
+        if (output.length > MAX_OUTPUT_BUFFER) {
+          const excess = output.length - MAX_OUTPUT_BUFFER
+          output = output.slice(excess)
+          truncatedBytes += excess
+        }
+
         ctx.metadata({
           metadata: {
             // truncate the metadata to avoid GIANT blobs of data (has nothing to do w/ what agent can access)
@@ -245,6 +359,10 @@ export const BashTool = Tool.define("bash", async () => {
           reject(error)
         })
       })
+
+      if (truncatedBytes > 0) {
+        output = `\n[...${truncatedBytes} bytes truncated from beginning — buffer capped at ${MAX_OUTPUT_BUFFER} bytes...]\n\n` + output
+      }
 
       const resultMetadata: string[] = []
 
