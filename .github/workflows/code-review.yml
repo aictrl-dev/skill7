@@ -88,11 +88,24 @@ jobs:
           npm install @aictrl/cli@latest
           echo "$RUNNER_TEMP/aictrl/node_modules/.bin" >> $GITHUB_PATH
 
-      - name: Configure Review Permissions
+      - name: Configure Review Workspace
         if: steps.check_changes.outputs.skip != 'true'
         run: |
-          # Allow the reviewer agent to read files and run gh commands
-          cat > opencode.json << 'PERM_EOF'
+          # Create an isolated workspace with its own git repo.
+          # Running aictrl from the monorepo checkout causes a silent ~130ms exit
+          # due to the catalog: protocol in package.json.
+          # Running from a bare temp dir (no git) also fails silently.
+          # Solution: minimal git repo + opencode.json with tool permissions.
+          REVIEW_DIR="$RUNNER_TEMP/review-workspace"
+          mkdir -p "$REVIEW_DIR"
+          cd "$REVIEW_DIR"
+          git init -q
+          git config user.email "ci@aictrl.dev"
+          git config user.name "aictrl-ci"
+          git commit --allow-empty -m "init" -q
+
+          # Allow the agent to use read tools and specific bash commands
+          cat > "$REVIEW_DIR/opencode.json" << 'PERM_EOF'
           {
             "permission": {
               "read": "allow",
@@ -112,6 +125,8 @@ jobs:
           }
           PERM_EOF
 
+          echo "REVIEW_DIR=$REVIEW_DIR" >> $GITHUB_ENV
+
       - name: Run Aictrl Review
         if: steps.check_changes.outputs.skip != 'true'
         timeout-minutes: 15
@@ -119,11 +134,41 @@ jobs:
           ZHIPU_API_KEY: ${{ secrets.ZHIPUAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-          REVIEW_PR_NUMBER: ${{ env.PR_NUMBER }}
-          REVIEW_PR_SHA: ${{ env.PR_SHA }}
-          REVIEW_PR_BASE: ${{ env.PR_BASE_REF }}
-          REVIEW_REPO: ${{ github.repository }}
         run: |
           echo "Starting review for PR #$PR_NUMBER (SHA $PR_SHA)..."
-          aictrl run --format json --model zai-coding-plan/glm-5 \
-            "You are reviewing PR #$REVIEW_PR_NUMBER on $REVIEW_REPO (SHA: $REVIEW_PR_SHA, base: $REVIEW_PR_BASE). You have access to the full repository checkout, gh CLI, and git. Use these tools to understand the changes — do NOT ask for the diff to be provided. Steps: 1) Run gh pr view $REVIEW_PR_NUMBER to get PR description. 2) Run gh pr diff $REVIEW_PR_NUMBER to see the changes. 3) Read any source files you need for context. 4) Focus on bugs, security issues, logic errors, and reliability. Skip style nits. 5) Post your review as a single comment: gh pr comment $REVIEW_PR_NUMBER --repo $REVIEW_REPO --body '<review>'. End with 'Reviewed SHA: $REVIEW_PR_SHA'."
+
+          # Run from isolated workspace to avoid monorepo catalog: protocol crash
+          cd "$REVIEW_DIR"
+
+          aictrl run --format json \
+            --model zai-coding-plan/glm-5 \
+            "You are reviewing PR #${PR_NUMBER} on ${GH_REPO} (SHA: ${PR_SHA}, base: ${PR_BASE_REF}).
+
+          You have access to the gh CLI, git, and file reading tools. Use them to understand the changes.
+
+          Steps:
+          1. Run: gh pr diff ${PR_NUMBER} --repo ${GH_REPO}
+          2. Read source files for context as needed using the read tool
+          3. Focus on bugs, security issues, logic errors, and reliability
+          4. Skip style nits and formatting opinions
+          5. Post your review as a single comment:
+             gh pr comment ${PR_NUMBER} --repo ${GH_REPO} --body '<your review here>
+
+             Reviewed SHA: ${PR_SHA}'" \
+            > "$RUNNER_TEMP/review-output.jsonl" \
+            2> "$RUNNER_TEMP/review-stderr.log" || true
+
+          echo ""
+          echo "=== Session NDJSON ==="
+          cat "$RUNNER_TEMP/review-output.jsonl"
+          echo ""
+
+          if [ -s "$RUNNER_TEMP/review-stderr.log" ]; then
+            echo "=== Session stderr ==="
+            cat "$RUNNER_TEMP/review-stderr.log"
+            echo ""
+          fi
+
+          # Report event count for diagnostics
+          EVENTS=$(wc -l < "$RUNNER_TEMP/review-output.jsonl" 2>/dev/null || echo "0")
+          echo "Total NDJSON events: $EVENTS"
