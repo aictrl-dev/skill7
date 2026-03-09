@@ -54,6 +54,19 @@ const parser = lazy(async () => {
 
 const SHELL_INTERPRETERS = new Set(["bash", "sh", "zsh", "dash", "ksh", "fish"])
 
+const TOKEN_TYPES = new Set(["command_name", "word", "string", "raw_string", "concatenation"])
+
+/** Extract token text from a command node, filtering to known token types. */
+function getCommandTokens(node: { childCount: number; child(i: number): { type: string; text: string } | null }): string[] {
+  const tokens: string[] = []
+  for (let i = 0; i < node.childCount; i++) {
+    const child = node.child(i)
+    if (!child) continue
+    if (TOKEN_TYPES.has(child.type)) tokens.push(child.text)
+  }
+  return tokens
+}
+
 function isShellInterpreter(commandName: string): boolean {
   // Handle both bare names and full paths (e.g., /bin/bash, /usr/bin/env bash)
   const base = commandName.split("/").pop() || ""
@@ -121,21 +134,7 @@ export const BashTool = Tool.define("bash", async () => {
         // Get full command text including redirects if present
         let commandText = node.parent?.type === "redirected_statement" ? node.parent.text : node.text
 
-        const command = []
-        for (let i = 0; i < node.childCount; i++) {
-          const child = node.child(i)
-          if (!child) continue
-          if (
-            child.type !== "command_name" &&
-            child.type !== "word" &&
-            child.type !== "string" &&
-            child.type !== "raw_string" &&
-            child.type !== "concatenation"
-          ) {
-            continue
-          }
-          command.push(child.text)
-        }
+        const command = getCommandTokens(node)
 
         // not an exhaustive list, but covers most common cases
         if (["cd", "rm", "cp", "mv", "mkdir", "touch", "chmod", "chown", "cat"].includes(command[0])) {
@@ -172,19 +171,7 @@ export const BashTool = Tool.define("bash", async () => {
       for (const node of tree.rootNode.descendantsOfType("command")) {
         if (!node) continue
 
-        const tokens: string[] = []
-        for (let i = 0; i < node.childCount; i++) {
-          const child = node.child(i)
-          if (!child) continue
-          if (
-            child.type === "command_name" ||
-            child.type === "word" ||
-            child.type === "string" ||
-            child.type === "raw_string" ||
-            child.type === "concatenation"
-          )
-            tokens.push(child.text)
-        }
+        const tokens = getCommandTokens(node)
         if (tokens.length === 0) continue
 
         const commandName = tokens[0]
@@ -218,30 +205,61 @@ export const BashTool = Tool.define("bash", async () => {
         }
 
         // Pattern 2: String argument to interpreter (bash -c 'cmd', eval "cmd")
+        // Handles: bash -c 'cmd', bash -c'cmd', bash -xc 'cmd', bash -c"cmd"
         for (let i = 1; i < tokens.length; i++) {
           const token = tokens[i]
-          if (token.startsWith("-") && token !== "-c") continue
 
           if (commandName === "eval") {
-            if (!token.startsWith("-")) {
-              const unquoted = token.replace(/^['"]|['"]$/g, "")
-              if (unquoted.trim()) {
-                const embeddedCommands = await extractEmbeddedCommands(unquoted, p)
-                for (const cmd of embeddedCommands) {
-                  patterns.add(cmd)
-                }
-              }
-            }
-          } else if (token === "-c" && i + 1 < tokens.length) {
-            const cmdString = tokens[i + 1]
-            const unquoted = cmdString.replace(/^['"]|['"]$/g, "")
+            if (token.startsWith("-")) continue
+            const unquoted = token.replace(/^['"]|['"]$/g, "")
             if (unquoted.trim()) {
               const embeddedCommands = await extractEmbeddedCommands(unquoted, p)
               for (const cmd of embeddedCommands) {
                 patterns.add(cmd)
               }
             }
-            break
+          } else {
+            // Determine if this token contains or is the -c flag
+            // Case 1: exact "-c" — next token is the command
+            // Case 2: "-c'cmd'" or '-c"cmd"' — command embedded after -c (concatenation token)
+            // Case 3: "-xc" — combined short flags ending with c, next token is the command
+            if (token === "-c") {
+              if (i + 1 < tokens.length) {
+                const cmdString = tokens[i + 1]
+                const unquoted = cmdString.replace(/^['"]|['"]$/g, "")
+                if (unquoted.trim()) {
+                  const embeddedCommands = await extractEmbeddedCommands(unquoted, p)
+                  for (const cmd of embeddedCommands) {
+                    patterns.add(cmd)
+                  }
+                }
+              }
+              break
+            } else if (token.startsWith("-c") && token.length > 2) {
+              // -c'cmd', -c"cmd", -ccmd — extract command after the -c prefix
+              const embedded = token.slice(2).replace(/^['"]|['"]$/g, "")
+              if (embedded.trim()) {
+                const embeddedCommands = await extractEmbeddedCommands(embedded, p)
+                for (const cmd of embeddedCommands) {
+                  patterns.add(cmd)
+                }
+              }
+              break
+            } else if (/^-[a-zA-Z]*c$/.test(token) && i + 1 < tokens.length) {
+              // Combined flags like -xc, -exc — c is last, next token is the command
+              const cmdString = tokens[i + 1]
+              const unquoted = cmdString.replace(/^['"]|['"]$/g, "")
+              if (unquoted.trim()) {
+                const embeddedCommands = await extractEmbeddedCommands(unquoted, p)
+                for (const cmd of embeddedCommands) {
+                  patterns.add(cmd)
+                }
+              }
+              break
+            } else if (token.startsWith("-")) {
+              // Other flags like -x, -e — skip
+              continue
+            }
           }
         }
       }

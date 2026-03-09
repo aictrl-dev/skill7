@@ -141,10 +141,28 @@ export namespace Filesystem {
       const realChild = await realpath(child)
       return !relative(realParent, realChild).startsWith("..")
     } catch {
-      // ENOENT: path doesn't exist on disk -- fall back to lexical check.
-      // This is safe because symlinks can only escape if the path actually
-      // resolves through an existing symlink. Non-existent paths are fine.
-      return !relative(parent, child).startsWith("..")
+      // child doesn't fully exist — resolve the longest existing prefix
+      // to catch symlinks in intermediate path components.
+      // Without this, a symlink like project/link -> /etc would bypass
+      // containment when targeting project/link/nonexistent (ENOENT).
+      try {
+        const realParent = await realpath(parent)
+        let current = child
+        while (current !== dirname(current)) {
+          try {
+            const realCurrent = await realpath(current)
+            // Found an existing ancestor — check if it's contained
+            return !relative(realParent, realCurrent).startsWith("..")
+          } catch {
+            current = dirname(current)
+          }
+        }
+        // Nothing in the path exists — fall back to lexical
+        return !relative(parent, child).startsWith("..")
+      } catch {
+        // parent itself doesn't exist — lexical fallback is all we can do
+        return !relative(parent, child).startsWith("..")
+      }
     }
   }
 

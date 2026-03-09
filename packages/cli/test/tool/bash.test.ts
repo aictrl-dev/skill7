@@ -454,6 +454,87 @@ describe("tool.bash interpreter bypass detection", () => {
     })
   })
 
+  test("detects commands in bash -c'cmd' without space (concatenation token)", async () => {
+    await using tmp = await tmpdir({ git: true })
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const bash = await BashTool.init()
+        const requests: Array<Omit<PermissionNext.Request, "id" | "sessionID" | "tool">> = []
+        const testCtx = {
+          ...ctx,
+          ask: async (req: Omit<PermissionNext.Request, "id" | "sessionID" | "tool">) => {
+            requests.push(req)
+          },
+        }
+        await bash.execute(
+          {
+            command: "bash -c'rm -rf /'",
+            description: "Bash -c without space",
+          },
+          testCtx,
+        )
+        const bashReq = requests.find((r) => r.permission === "bash")
+        expect(bashReq).toBeDefined()
+        expect(bashReq!.patterns).toContain("rm -rf /")
+      },
+    })
+  })
+
+  test("detects commands in bash -c\"cmd\" without space (double-quoted concatenation)", async () => {
+    await using tmp = await tmpdir({ git: true })
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const bash = await BashTool.init()
+        const requests: Array<Omit<PermissionNext.Request, "id" | "sessionID" | "tool">> = []
+        const testCtx = {
+          ...ctx,
+          ask: async (req: Omit<PermissionNext.Request, "id" | "sessionID" | "tool">) => {
+            requests.push(req)
+          },
+        }
+        await bash.execute(
+          {
+            command: 'bash -c"rm -rf /"',
+            description: "Bash -c double-quoted without space",
+          },
+          testCtx,
+        )
+        const bashReq = requests.find((r) => r.permission === "bash")
+        expect(bashReq).toBeDefined()
+        expect(bashReq!.patterns).toContain("rm -rf /")
+      },
+    })
+  })
+
+  test("detects commands in bash -xc 'cmd' (combined flags)", async () => {
+    await using tmp = await tmpdir({ git: true })
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const bash = await BashTool.init()
+        const requests: Array<Omit<PermissionNext.Request, "id" | "sessionID" | "tool">> = []
+        const testCtx = {
+          ...ctx,
+          ask: async (req: Omit<PermissionNext.Request, "id" | "sessionID" | "tool">) => {
+            requests.push(req)
+          },
+        }
+        await bash.execute(
+          {
+            command: "bash -xc 'echo hello'",
+            description: "Bash with combined flags -xc",
+          },
+          testCtx,
+        )
+        const bashReq = requests.find((r) => r.permission === "bash")
+        expect(bashReq).toBeDefined()
+        expect(bashReq!.patterns).toContain("echo hello")
+      },
+    })
+  })
+
   test("does not re-parse heredoc to non-interpreter (cat << EOF is harmless)", async () => {
     await using tmp = await tmpdir({ git: true })
     await Instance.provide({
