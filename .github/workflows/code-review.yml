@@ -148,4 +148,4 @@ jobs:
           # Run from a clean temp dir to avoid the monorepo's config affecting session
           cd "$RUNNER_TEMP"
           aictrl run --format json --model zai-coding-plan/glm-5 \
-            "$(cat "$RUNNER_TEMP/review-prompt.txt")"
+            "Review this PR" < "$RUNNER_TEMP/review-prompt.txt"
