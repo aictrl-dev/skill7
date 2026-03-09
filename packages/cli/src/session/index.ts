@@ -210,16 +210,29 @@ export namespace Session {
         error: MessageV2.Assistant.shape.error,
       }),
     ),
-    SkillsLoaded: BusEvent.define(
-      "session.skills_loaded",
+    SkillDiscovered: BusEvent.define(
+      "session.skill_discovered",
       z.object({
         sessionID: z.string(),
-        skills: z.array(
-          z.object({
-            name: z.string(),
-            location: z.string(),
-          }),
-        ),
+        name: z.string(),
+        description: z.string(),
+        location: z.string(),
+      }),
+    ),
+    SkillLoaded: BusEvent.define(
+      "session.skill_loaded",
+      z.object({
+        sessionID: z.string(),
+        name: z.string(),
+        location: z.string(),
+      }),
+    ),
+    SkillResourceLoaded: BusEvent.define(
+      "session.skill_resource_loaded",
+      z.object({
+        sessionID: z.string(),
+        skillName: z.string(),
+        filePath: z.string(),
       }),
     ),
   }
