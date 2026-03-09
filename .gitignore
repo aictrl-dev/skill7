@@ -23,6 +23,9 @@ target
 .scripts
 .direnv/
 
+# Planning docs
+.planning/
+
 # Local dev files
 aictrl-dev
 logs/

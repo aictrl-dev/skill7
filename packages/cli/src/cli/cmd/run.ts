@@ -552,12 +552,31 @@ export const RunCommand = cmd({
             UI.error(err)
           }
 
-          if (event.type === "session.skills_loaded") {
+          if (event.type === "session.skill_discovered") {
             const props = event.properties
             if (props.sessionID !== sessionID) continue
-            emit("skills_loaded", {
-              skills: props.skills,
-              count: props.skills.length,
+            emit("skill_discovered", {
+              name: props.name,
+              description: props.description,
+              location: props.location,
+            })
+          }
+
+          if (event.type === "session.skill_loaded") {
+            const props = event.properties
+            if (props.sessionID !== sessionID) continue
+            emit("skill_loaded", {
+              name: props.name,
+              location: props.location,
+            })
+          }
+
+          if (event.type === "session.skill_resource_loaded") {
+            const props = event.properties
+            if (props.sessionID !== sessionID) continue
+            emit("skill_resource_loaded", {
+              skillName: props.skillName,
+              filePath: props.filePath,
             })
           }
 

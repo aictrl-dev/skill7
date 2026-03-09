@@ -7,9 +7,23 @@ import { PermissionNext } from "../permission/next"
 import { Ripgrep } from "../file/ripgrep"
 import { iife } from "@/util/iife"
 import { Plugin } from "../plugin"
+import { Bus } from "../bus"
+import { Session } from "../session"
 
 export const SkillTool = Tool.define("skill", async (ctx) => {
   const skills = await Skill.all()
+
+  // Emit per-skill discovery events when descriptions are registered in tool schema
+  if (ctx?.sessionID) {
+    for (const skill of skills) {
+      Bus.publish(Session.Event.SkillDiscovered, {
+        sessionID: ctx.sessionID,
+        name: skill.name,
+        description: skill.description,
+        location: skill.location,
+      })
+    }
+  }
 
   // Filter skills by agent permissions if agent provided
   const agent = ctx?.agent
@@ -68,6 +82,12 @@ export const SkillTool = Tool.define("skill", async (ctx) => {
       }
 
       await Plugin.trigger("skill.load", { sessionID: ctx.sessionID, name: skill.name, location: skill.location }, skill)
+
+      Bus.publish(Session.Event.SkillLoaded, {
+        sessionID: ctx.sessionID,
+        name: skill.name,
+        location: skill.location,
+      })
 
       await ctx.ask({
         permission: "skill",

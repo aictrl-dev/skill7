@@ -11,12 +11,33 @@ import { Instance } from "../project/instance"
 import { assertExternalDirectory } from "./external-directory"
 import { InstructionPrompt } from "../session/instruction"
 import { Filesystem } from "../util/filesystem"
+import { Skill } from "../skill"
+import { Bus } from "../bus"
+import { Session } from "../session"
 
 const DEFAULT_READ_LIMIT = 2000
 const MAX_LINE_LENGTH = 2000
 const MAX_LINE_SUFFIX = `... (line truncated to ${MAX_LINE_LENGTH} chars)`
 const MAX_BYTES = 50 * 1024
 const MAX_BYTES_LABEL = `${MAX_BYTES / 1024} KB`
+
+async function emitSkillResourceEvent(sessionID: string, filepath: string) {
+  const skillDirs = await Skill.dirs()
+  for (const dir of skillDirs) {
+    if (Filesystem.contains(dir, filepath)) {
+      const skills = await Skill.all()
+      const skill = skills.find((s) => Filesystem.contains(path.dirname(s.location), filepath))
+      if (skill) {
+        Bus.publish(Session.Event.SkillResourceLoaded, {
+          sessionID,
+          skillName: skill.name,
+          filePath: filepath,
+        })
+      }
+      break
+    }
+  }
+}
 
 export const ReadTool = Tool.define("read", {
   description: DESCRIPTION,
@@ -122,6 +143,7 @@ export const ReadTool = Tool.define("read", {
     const isImage = mime.startsWith("image/") && mime !== "image/svg+xml" && mime !== "image/vnd.fastbidsheet"
     const isPdf = mime === "application/pdf"
     if (isImage || isPdf) {
+      await emitSkillResourceEvent(ctx.sessionID, filepath)
       const msg = `${isImage ? "Image" : "PDF"} read successfully`
       return {
         title,
@@ -215,6 +237,7 @@ export const ReadTool = Tool.define("read", {
     // just warms the lsp client
     LSP.touchFile(filepath, false)
     FileTime.read(ctx.sessionID, filepath)
+    await emitSkillResourceEvent(ctx.sessionID, filepath)
 
     if (instructions.length > 0) {
       output += `\n\n<system-reminder>\n${instructions.map((i) => i.content).join("\n\n")}\n</system-reminder>`
