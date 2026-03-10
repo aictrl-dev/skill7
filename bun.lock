@@ -339,6 +339,8 @@
 
     "@aictrl/cli": ["@aictrl/cli@workspace:packages/cli"],
 
+    "@aictrl/cli-linux-x64": ["@aictrl/cli-linux-x64@0.2.0", "", { "os": "linux", "cpu": "x64" }, "sha512-2RZ/5E2wS5V6fDGoU/HwFjZwgH+gS7KBW7OXuB91NvwBbI085KTpjkShXbe78RrnJGiCX3Dr0kqpUTWB05BaaQ=="],
+
     "@aictrl/plugin": ["@aictrl/plugin@workspace:packages/plugin"],
 
     "@aictrl/script": ["@aictrl/script@workspace:packages/script"],
