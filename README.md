@@ -11,7 +11,7 @@
 
 ---
 
-Aictrl is a headless, server-side runtime for autonomous AI agent workflows. Run agent skills in CI/CD pipelines, Cloud Run, or any environment — no terminal UI required.
+Aictrl is a headless, server-side runtime for autonomous AI agent workflows. It is designed for engineers who want to automate complex tasks using agentic models in CI/CD pipelines, cron jobs, or embedded within other applications.
 
 ## Install
 
@@ -19,110 +19,102 @@ Aictrl is a headless, server-side runtime for autonomous AI agent workflows. Run
 npm i -g @aictrl/cli
 ```
 
-## Usage
-
-### Run a task
+## Quick Start
 
 ```bash
+# Run a one-off task
 aictrl run "analyze the security of this repository"
+
+# Use a specific model
+aictrl run --model anthropic/claude-3-5-sonnet-latest "refactor the auth module"
 ```
 
-### Use a specific model
+## Automation & Headless Usage
+
+Aictrl is "headless first". When run in a non-TTY environment, it automatically switches to a mode optimized for automation.
+
+### Stdin Piping
+You can pipe content directly into `aictrl`. This is useful for processing logs, code, or command output.
 
 ```bash
-aictrl run --model anthropic/claude-sonnet-4-20250514 "refactor the auth module"
+cat logs.txt | aictrl run "summarize these errors"
 ```
 
-### JSON output for pipelines
+### JSON Output
+For programmatic consumption, use `--format json` to get raw events.
 
 ```bash
 aictrl run --format json "review this PR" | jq '.type'
 ```
 
-### Attach files
+### Non-Interactive Execution
+In headless mode, Aictrl automatically rejects all interactive permission requests (like `question` or `plan_enter`), ensuring your pipelines never hang.
 
+### CI/CD Integration
+Set `AICTRL_HEADLESS=true` in your environment to force headless behavior even in pseudo-TTYs.
+
+## GitHub Integration
+
+Aictrl includes a specialized GitHub agent that can be installed into your repositories to automate PR reviews, issue triage, and code generation.
+
+### Setup
 ```bash
-aictrl run --file screenshot.png "what's wrong with this UI?"
+# Install the GitHub agent in the current repo
+aictrl github install
 ```
 
-## Configuration
+### Features
+- **Auto-Push:** The agent can commit and push changes directly to your branches.
+- **PR Creation:** It can automatically open Pull Requests for its changes.
+- **Context Aware:** In GitHub Actions, it automatically fetches PR diffs, issue comments, and review history.
+- **Social Cards:** Generates visual summaries of agent sessions.
 
-Aictrl reads configuration from `.aictrl/` directories (project-level and `~/.config/aictrl/` global).
+## Developer Workflow
 
-### Models
-
-Any model from any supported provider. Set the API key as an env var:
-
-| Provider | Env Var | Example Model |
-|----------|---------|---------------|
-| Anthropic | `ANTHROPIC_API_KEY` | `anthropic/claude-sonnet-4-20250514` |
-| OpenAI | `OPENAI_API_KEY` | `openai/gpt-4o` |
-| Google | `GOOGLE_API_KEY` | `google/gemini-2.5-pro` |
-| OpenRouter | `OPENROUTER_API_KEY` | `openrouter/...` |
-| ZhipuAI | `ZHIPU_API_KEY` | `zai-coding-plan/glm-5` |
-
-Run `aictrl models` for the full list.
-
-### Skills
-
-Skills are modular agent capabilities defined as `SKILL.md` files. Place them in:
-
-- `.aictrl/skills/` (project-level)
-- `~/.config/aictrl/skills/` (global)
-
-### MCP Servers
-
-Configure MCP servers for external tool integration:
+### PR Checkout
+Engineers can quickly checkout a PR and import the associated agent session:
 
 ```bash
-aictrl mcp add my-server --url http://localhost:8080
+aictrl pr 123
+```
+This command will:
+1. Fetch and checkout PR #123.
+2. Detect if an Aictrl session was used to generate the PR.
+3. Import that session locally so you can continue the conversation.
+
+### MCP & Custom Tools
+Aictrl supports the [Model Context Protocol (MCP)](https://modelcontextprotocol.io).
+
+```bash
+# Add an MCP server
+aictrl mcp add my-tool --url http://localhost:8080
+
+# Add custom TypeScript tools
+# Just drop them in .aictrl/tool/
 ```
 
-### Custom Tools
+## Programmatic SDK
 
-Drop TypeScript files in `.aictrl/tool/` or `.aictrl/tools/` to register custom tools.
-
-## Commands
-
-| Command | Description |
-|---------|-------------|
-| `aictrl run <message>` | Execute a task headlessly |
-| `aictrl models` | List available models |
-| `aictrl mcp` | Manage MCP servers |
-| `aictrl session` | Manage sessions |
-| `aictrl upgrade` | Upgrade the CLI |
-| `aictrl pr` | PR workflow helpers |
-
-## SDK
-
-For programmatic use:
+Embed Aictrl directly into your TypeScript applications.
 
 ```typescript
-import { createAictrl } from "@aictrl/sdk"
+import { createAictrlClient } from "@aictrl/sdk"
 
-const client = await createAictrl()
+const client = createAictrlClient({
+  baseUrl: "http://localhost:4096"
+})
+
+const session = await client.session.create({
+  title: "My Automation Task"
+})
 ```
 
-## Monorepo
+## Agent Client Protocol (ACP)
 
-| Package | Description |
-|---------|-------------|
-| `@aictrl/cli` | The CLI and headless runtime |
-| `@aictrl/sdk` | Programmatic SDK for embedding |
-| `@aictrl/plugin` | Plugin authoring utilities |
-| `@aictrl/util` | Shared utilities |
-
-## Development
+Aictrl implements the [Agent Client Protocol](https://github.com/agentclientprotocol/specification), allowing other ACP-compatible agents to communicate with Aictrl headlessly.
 
 ```bash
-bun install
-bun run --conditions=browser packages/cli/src/index.ts
-```
-
-Build platform binaries:
-
-```bash
-cd packages/cli && bun run build --single
+aictrl acp
 ```
 
 ## Attribution
