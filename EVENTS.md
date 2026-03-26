@@ -100,6 +100,7 @@ Emitted when a tool call completes (success or error). This includes tools execu
   "part": {
     "type": "tool",
     "tool": "bash",
+    "sessionID": "session_01abc...",
     "state": {
       "status": "completed",
       "input": { "command": "ls" },
@@ -111,18 +112,7 @@ Emitted when a tool call completes (success or error). This includes tools execu
 
 `state.status` is `"completed"` or `"error"`. On error, `state.error` contains the error message.
 
-When the tool was executed inside a subagent, the event includes additional fields:
-
-```json
-{
-  "type": "tool_use",
-  "part": { "..." },
-  "subagentSessionID": "session_01xyz...",
-  "parentSessionID": "session_01abc..."
-}
-```
-
-These fields are absent for tools executed in the primary session.
+For tools executed inside a subagent, `part.sessionID` will differ from the top-level `sessionID` — compare the two to identify subagent tool calls.
 
 ### `step_start` / `step_finish`
 

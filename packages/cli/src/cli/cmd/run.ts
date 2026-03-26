@@ -446,7 +446,7 @@ export const RunCommand = cmd({
       const events = await sdk.event.subscribe()
       let error: string | undefined
       const startTime = Date.now()
-      const childSessions = new Map<string, { title: string }>()
+      const childSessions = new Set<string>()
 
       async function loop() {
         const toggles = new Map<string, boolean>()
@@ -476,7 +476,7 @@ export const RunCommand = cmd({
           if (event.type === "message.part.updated") {
             const part = event.properties.part
 
-            // Emit tool_use events for subagent sessions in JSON mode
+            // Skip non-primary session events, but emit tool_use for subagent sessions in JSON mode
             if (part.sessionID !== sessionID) {
               if (
                 args.format === "json" &&
@@ -484,11 +484,7 @@ export const RunCommand = cmd({
                 part.type === "tool" &&
                 (part.state.status === "completed" || part.state.status === "error")
               ) {
-                emit("tool_use", {
-                  part,
-                  subagentSessionID: part.sessionID,
-                  parentSessionID: sessionID,
-                })
+                emit("tool_use", { part })
               }
               continue
             }
@@ -599,7 +595,7 @@ export const RunCommand = cmd({
           if (event.type === "session.created") {
             const info = event.properties.info
             if (info.parentID === sessionID) {
-              childSessions.set(info.id, { title: info.title })
+              childSessions.add(info.id)
               emit("subagent_start", {
                 subagentSessionID: info.id,
                 parentSessionID: sessionID,
