@@ -92,7 +92,7 @@ Emitted when extended thinking content is complete (requires `--thinking` flag).
 
 ### `tool_use`
 
-Emitted when a tool call completes (success or error).
+Emitted when a tool call completes (success or error). This includes tools executed within subagent sessions.
 
 ```json
 {
@@ -110,6 +110,19 @@ Emitted when a tool call completes (success or error).
 ```
 
 `state.status` is `"completed"` or `"error"`. On error, `state.error` contains the error message.
+
+When the tool was executed inside a subagent, the event includes additional fields:
+
+```json
+{
+  "type": "tool_use",
+  "part": { "..." },
+  "subagentSessionID": "session_01xyz...",
+  "parentSessionID": "session_01abc..."
+}
+```
+
+These fields are absent for tools executed in the primary session.
 
 ### `step_start` / `step_finish`
 
