@@ -475,7 +475,19 @@ export const RunCommand = cmd({
 
           if (event.type === "message.part.updated") {
             const part = event.properties.part
-            if (part.sessionID !== sessionID) continue
+
+            // Skip non-primary session events, but emit tool_use for subagent sessions in JSON mode
+            if (part.sessionID !== sessionID) {
+              if (
+                args.format === "json" &&
+                childSessions.has(part.sessionID) &&
+                part.type === "tool" &&
+                (part.state.status === "completed" || part.state.status === "error")
+              ) {
+                emit("tool_use", { part })
+              }
+              continue
+            }
 
             if (part.type === "tool" && (part.state.status === "completed" || part.state.status === "error")) {
               if (emit("tool_use", { part })) continue
