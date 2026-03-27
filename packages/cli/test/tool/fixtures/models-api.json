@@ -1747,6 +1747,23 @@
     "name": "Z.AI Coding Plan",
     "doc": "https://docs.z.ai/devpack/overview",
     "models": {
+      "glm-5.1": {
+        "id": "glm-5.1",
+        "name": "GLM-5.1",
+        "family": "glm",
+        "attachment": false,
+        "reasoning": true,
+        "tool_call": true,
+        "interleaved": { "field": "reasoning_content" },
+        "temperature": true,
+        "knowledge": "2026-01",
+        "release_date": "2026-03-27",
+        "last_updated": "2026-03-27",
+        "modalities": { "input": ["text"], "output": ["text"] },
+        "open_weights": true,
+        "cost": { "input": 0, "output": 0, "cache_read": 0, "cache_write": 0 },
+        "limit": { "context": 204800, "output": 131072 }
+      },
       "glm-4.7": {
         "id": "glm-4.7",
         "name": "GLM-4.7",

@@ -296,6 +296,7 @@ export namespace ProviderTransform {
     if (id.includes("gemini")) return 1.0
     if (id.includes("glm-4.6")) return 1.0
     if (id.includes("glm-4.7")) return 1.0
+    if (id.includes("glm-5")) return 1.0
     if (id.includes("minimax-m2")) return 1.0
     if (id.includes("kimi-k2")) {
       // kimi-k2-thinking & kimi-k2.5 && kimi-k2p5 && kimi-k2-5
@@ -705,7 +706,7 @@ export namespace ProviderTransform {
 
     if (
       input.model.providerID === "baseten" ||
-      (input.model.providerID === "aictrl" && ["kimi-k2-thinking", "glm-4.6"].includes(input.model.api.id))
+      (input.model.providerID === "aictrl" && ["kimi-k2-thinking", "glm-4.6", "glm-5.1"].includes(input.model.api.id))
     ) {
       result["chat_template_args"] = { enable_thinking: true }
     }
