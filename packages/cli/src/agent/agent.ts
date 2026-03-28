@@ -70,6 +70,13 @@ export namespace Agent {
         "*.env.*": "ask",
         "*.env.example": "allow",
       },
+      // protect config files from agent modification — prevents privilege escalation
+      // where the agent weakens its own permission rules for future sessions
+      edit: {
+        "*": "allow",
+        "*aictrl.jsonc": "ask",
+        "*aictrl.json": "ask",
+      },
     })
     const user = PermissionNext.fromConfig(cfg.permission ?? {})
 
