@@ -670,6 +670,61 @@ test("ask - checks all patterns and stops on first deny", async () => {
   })
 })
 
+// config file protection tests
+
+test("evaluate - config file patterns require ask for aictrl.jsonc", () => {
+  const ruleset = PermissionNext.fromConfig({
+    edit: {
+      "*": "allow",
+      "*aictrl.jsonc": "ask",
+      "*aictrl.json": "ask",
+    },
+  })
+  expect(PermissionNext.evaluate("edit", "aictrl.jsonc", ruleset).action).toBe("ask")
+  expect(PermissionNext.evaluate("edit", ".aictrl/aictrl.jsonc", ruleset).action).toBe("ask")
+})
+
+test("evaluate - config file patterns require ask for aictrl.json", () => {
+  const ruleset = PermissionNext.fromConfig({
+    edit: {
+      "*": "allow",
+      "*aictrl.jsonc": "ask",
+      "*aictrl.json": "ask",
+    },
+  })
+  expect(PermissionNext.evaluate("edit", "aictrl.json", ruleset).action).toBe("ask")
+  expect(PermissionNext.evaluate("edit", ".aictrl/aictrl.json", ruleset).action).toBe("ask")
+})
+
+test("evaluate - config file protection still allows normal file edits", () => {
+  const ruleset = PermissionNext.fromConfig({
+    edit: {
+      "*": "allow",
+      "*aictrl.jsonc": "ask",
+      "*aictrl.json": "ask",
+    },
+  })
+  expect(PermissionNext.evaluate("edit", "src/foo.ts", ruleset).action).toBe("allow")
+  expect(PermissionNext.evaluate("edit", "package.json", ruleset).action).toBe("allow")
+})
+
+test("evaluate - user config can override config file protection", () => {
+  const defaults = PermissionNext.fromConfig({
+    edit: {
+      "*": "allow",
+      "*aictrl.jsonc": "ask",
+      "*aictrl.json": "ask",
+    },
+  })
+  const user = PermissionNext.fromConfig({
+    edit: {
+      "*aictrl.jsonc": "allow",
+    },
+  })
+  const merged = PermissionNext.merge(defaults, user)
+  expect(PermissionNext.evaluate("edit", "aictrl.jsonc", merged).action).toBe("allow")
+})
+
 test("ask - allows all patterns when all match allow rules", async () => {
   await using tmp = await tmpdir({ git: true })
   await Instance.provide({
