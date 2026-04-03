@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1 (2026-04-03)
+
+### Fixes
+
+- **GLM-5.1 model support** — Added `zai-coding-plan` provider with custom loader and thinking config, enabling `glm-5.1` which is currently only available via the ZhipuAI CodingPlan API.
+
 ## 0.2.0 (2026-03-10)
 
 ### Features

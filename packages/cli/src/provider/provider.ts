@@ -578,6 +578,15 @@ export namespace Provider {
         },
       }
     },
+    "zai-coding-plan": async () => {
+      const apiKey = Env.get("ZHIPU_API_KEY")
+      return {
+        autoload: !!apiKey,
+        options: {
+          apiKey,
+        },
+      }
+    },
   }
 
   export const Model = z
