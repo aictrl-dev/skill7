@@ -21,8 +21,21 @@ jobs:
         with:
           node-version: 22
 
-      - name: Upgrade npm for OIDC trusted publishing
-        run: npm install -g npm@latest
+      - name: Activate pinned npm via corepack for OIDC trusted publishing
+        # npm's OIDC trusted publishing support requires npm >= 11.5.0, but the
+        # runner's bundled npm (10.9.x) is older. Previously this step ran
+        # `npm install -g npm@latest`, which self-corrupted on the runner's
+        # prebuilt tree and produced MODULE_NOT_FOUND for promise-retry —
+        # silently breaking every release since v0.3.1.
+        #
+        # Corepack ships with Node 22 and installs package managers to its
+        # own shim directory, sidestepping the self-upgrade corruption path
+        # entirely. Pinning to a specific version stops tracking a moving
+        # target that has historically shipped regressions.
+        run: |
+          corepack enable
+          corepack prepare npm@11.5.2 --activate
+          npm --version
 
       - name: Install dependencies
         run: bun install
