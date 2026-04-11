@@ -128,7 +128,6 @@
     "zod-to-json-schema": "3.24.5"
   },
   "optionalDependencies": {
-    "@aictrl/cli-linux-x64": "0.2.0",
     "@parcel/watcher": "2.5.1",
     "bun-pty": "0.4.8"
   },
