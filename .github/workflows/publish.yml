@@ -46,16 +46,31 @@ jobs:
         working-directory: packages/sdk
         run: bun pm pack && npm publish *.tgz --access public --provenance || true
 
-      - name: Publish @aictrl/cli-linux-x64
-        working-directory: packages/cli/dist/@aictrl/cli-linux-x64
-        run: npm publish --access public --provenance || true
+      - name: Publish platform binary packages
+        working-directory: packages/cli/dist/@aictrl
+        run: |
+          # Publish every @aictrl/cli-<platform>-<arch>[-variant] package that the
+          # build step produced. Each directory contains a generated package.json
+          # stamped with the release version. Individual failures (e.g. version
+          # already published on a rerun) are tolerated to match the convention
+          # used by the other publish steps in this workflow.
+          for dir in */; do
+            echo "Publishing ${dir%/}"
+            (cd "$dir" && npm publish --access public --provenance) || true
+          done
 
-      - name: Strip bundled deps from CLI package.json
+      - name: Strip bundled deps and refresh platform binary optionalDependencies
         working-directory: packages/cli
         run: |
-          # All dependencies are bundled into the compiled binary.
-          # Only optionalDependencies (platform binaries) are needed at install time.
+          # All bundleable dependencies are compiled into the native binary, so
+          # the published package only needs:
+          #   - platform binary packages (regenerated below from dist/ to match
+          #     the release version — otherwise stale pins ship the wrong binary)
+          #   - genuine runtime optionals like @parcel/watcher and bun-pty that
+          #     must be resolved at install time against the host platform
           node -e "
+            const fs = require('fs');
+            const path = require('path');
             const pkg = require('./package.json');
             delete pkg.dependencies;
             delete pkg.devDependencies;
@@ -64,7 +79,39 @@ jobs:
             delete pkg.overrides;
             delete pkg.exports;
             delete pkg.type;
-            require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+
+            // Preserve non-platform-binary optionals (real runtime deps);
+            // drop any @aictrl/cli-* entries so we can repopulate from dist/.
+            const preserved = {};
+            for (const [name, version] of Object.entries(pkg.optionalDependencies || {})) {
+              if (!name.startsWith('@aictrl/cli-')) preserved[name] = version;
+            }
+
+            const distDir = path.join('dist', '@aictrl');
+            const platformDeps = {};
+            for (const entry of fs.readdirSync(distDir, { withFileTypes: true })) {
+              if (!entry.isDirectory()) continue;
+              const manifestPath = path.join(distDir, entry.name, 'package.json');
+              if (!fs.existsSync(manifestPath)) continue;
+              const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+              // Only accept packages that match the platform binary naming
+              // shape (@aictrl/cli-<linux|darwin|windows>-<arch>...). This
+              // guards against any non-binary subdirectory that may end up
+              // alongside them (e.g. the @aictrl/cli-ai wrapper that the
+              // legacy script/publish.ts creates) leaking into
+              // optionalDependencies.
+              if (typeof manifest.name !== 'string' || !/^@aictrl\/cli-(linux|darwin|windows)(-[a-z0-9]+)+$/.test(manifest.name)) {
+                continue;
+              }
+              platformDeps[manifest.name] = manifest.version;
+            }
+            if (Object.keys(platformDeps).length === 0) {
+              throw new Error('No platform binary packages found in ' + distDir);
+            }
+
+            pkg.optionalDependencies = { ...preserved, ...platformDeps };
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+            console.log('optionalDependencies:', pkg.optionalDependencies);
           "
 
       - name: Publish @aictrl/cli
