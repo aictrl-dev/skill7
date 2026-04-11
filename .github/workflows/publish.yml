@@ -89,10 +89,20 @@ jobs:
 
             const distDir = path.join('dist', '@aictrl');
             const platformDeps = {};
-            for (const entry of fs.readdirSync(distDir)) {
-              const manifest = JSON.parse(
-                fs.readFileSync(path.join(distDir, entry, 'package.json'), 'utf8')
-              );
+            for (const entry of fs.readdirSync(distDir, { withFileTypes: true })) {
+              if (!entry.isDirectory()) continue;
+              const manifestPath = path.join(distDir, entry.name, 'package.json');
+              if (!fs.existsSync(manifestPath)) continue;
+              const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+              // Only accept packages that match the platform binary naming
+              // shape (@aictrl/cli-<linux|darwin|windows>-<arch>...). This
+              // guards against any non-binary subdirectory that may end up
+              // alongside them (e.g. the @aictrl/cli-ai wrapper that the
+              // legacy script/publish.ts creates) leaking into
+              // optionalDependencies.
+              if (typeof manifest.name !== 'string' || !/^@aictrl\/cli-(linux|darwin|windows)(-[a-z0-9]+)+$/.test(manifest.name)) {
+                continue;
+              }
               platformDeps[manifest.name] = manifest.version;
             }
             if (Object.keys(platformDeps).length === 0) {
