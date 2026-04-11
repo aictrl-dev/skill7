@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.2 (2026-04-11)
+
+### Fixes
+
+- **Platform binary `optionalDependencies` regenerated at publish time** — `@aictrl/cli@0.3.0` and `@0.3.1` shipped with `@aictrl/cli-linux-x64` hard-pinned to `0.2.0`, so vanilla upgrades silently kept running the stale native binary. The publish workflow now publishes every platform binary the build produces (linux/darwin/windows × x64/arm64 × musl/baseline variants) and regenerates `@aictrl/cli`'s `optionalDependencies` from those manifests at release time, while preserving genuine runtime optionals (`@parcel/watcher`, `bun-pty`). (#46)
+
 ## 0.3.1 (2026-04-03)
 
 ### Fixes
