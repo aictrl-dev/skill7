@@ -21,20 +21,24 @@ jobs:
         with:
           node-version: 22
 
-      - name: Activate pinned npm via corepack for OIDC trusted publishing
-        # npm's OIDC trusted publishing support requires npm >= 11.5.0, but the
-        # runner's bundled npm (10.9.x) is older. Previously this step ran
-        # `npm install -g npm@latest`, which self-corrupted on the runner's
-        # prebuilt tree and produced MODULE_NOT_FOUND for promise-retry —
-        # silently breaking every release since v0.3.1.
+      - name: Upgrade npm to 11.10.1 for OIDC trusted publishing
+        # OIDC trusted publishing (auto-auth via GitHub Actions id-token) is
+        # supported from npm >= 11.5.0, so the runner's bundled npm (10.9.x)
+        # is too old and must be upgraded.
         #
-        # Corepack ships with Node 22 and installs package managers to its
-        # own shim directory, sidestepping the self-upgrade corruption path
-        # entirely. Pinning to a specific version stops tracking a moving
-        # target that has historically shipped regressions.
+        # Must be pinned below 11.11.0. In 11.11.0 (npm/cli#9008) the
+        # `promise-retry` dep was replaced with `@gar/promise-retry`, and
+        # installing that version over the runner's bundled 10.9.x tree
+        # leaves orphaned arborist files still `require('promise-retry')`,
+        # producing MODULE_NOT_FOUND and silently breaking every release
+        # since v0.3.1. Pinning to 11.10.1 (last version with `promise-retry`)
+        # avoids the removal boundary entirely.
+        #
+        # Corepack's `--activate` was tried (0837d45) but left the on-PATH
+        # npm at the runner's bundled 10.9.7, so OIDC auth never engaged
+        # and every publish failed with ENEEDAUTH.
         run: |
-          corepack enable
-          corepack prepare npm@11.5.2 --activate
+          npm install -g npm@11.10.1
           npm --version
 
       - name: Install dependencies
