@@ -60,6 +60,7 @@ jobs:
           # partial failure still succeed. Every other error - ENEEDAUTH,
           # network, etc - must fail loud. See issue #51 for the v0.3.1 /
           # v0.3.2 silent-failure post-mortem that motivated this wrapper.
+          rm -f *.tgz
           bun pm pack
           tarball=$(ls -1 *.tgz 2>/dev/null | head -n1)
           if [ -z "$tarball" ]; then
@@ -83,6 +84,7 @@ jobs:
         working-directory: packages/plugin
         run: |
           # See @aictrl/util step for wrapper rationale (issue #51).
+          rm -f *.tgz
           bun pm pack
           tarball=$(ls -1 *.tgz 2>/dev/null | head -n1)
           if [ -z "$tarball" ]; then
@@ -106,6 +108,7 @@ jobs:
         working-directory: packages/sdk
         run: |
           # See @aictrl/util step for wrapper rationale (issue #51).
+          rm -f *.tgz
           bun pm pack
           tarball=$(ls -1 *.tgz 2>/dev/null | head -n1)
           if [ -z "$tarball" ]; then
@@ -215,6 +218,7 @@ jobs:
         working-directory: packages/cli
         run: |
           # See @aictrl/util step for wrapper rationale (issue #51).
+          rm -f *.tgz
           bun pm pack
           tarball=$(ls -1 *.tgz 2>/dev/null | head -n1)
           if [ -z "$tarball" ]; then
