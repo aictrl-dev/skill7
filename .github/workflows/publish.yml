@@ -53,27 +53,45 @@ jobs:
 
       - name: Publish @aictrl/util
         working-directory: packages/util
-        run: bun pm pack && npm publish *.tgz --access public --provenance || true
+        run: ${{ github.workspace }}/.github/scripts/publish-if-new.sh "@aictrl/util"
 
       - name: Publish @aictrl/plugin
         working-directory: packages/plugin
-        run: bun pm pack && npm publish *.tgz --access public --provenance || true
+        run: ${{ github.workspace }}/.github/scripts/publish-if-new.sh "@aictrl/plugin"
 
       - name: Publish @aictrl/sdk
         working-directory: packages/sdk
-        run: bun pm pack && npm publish *.tgz --access public --provenance || true
+        run: ${{ github.workspace }}/.github/scripts/publish-if-new.sh "@aictrl/sdk"
 
       - name: Publish platform binary packages
         working-directory: packages/cli/dist/@aictrl
         run: |
-          # Publish every @aictrl/cli-<platform>-<arch>[-variant] package that the
-          # build step produced. Each directory contains a generated package.json
-          # stamped with the release version. Individual failures (e.g. version
-          # already published on a rerun) are tolerated to match the convention
-          # used by the other publish steps in this workflow.
-          for dir in */; do
-            echo "Publishing ${dir%/}"
-            (cd "$dir" && npm publish --access public --provenance) || true
+          # Publish every @aictrl/cli-<platform>-<arch>[-variant] package that
+          # the build step produced. Each directory contains a generated
+          # package.json stamped with the release version. Individual
+          # "already published" errors are tolerated (for reruns), but every
+          # other failure - ENEEDAUTH, network, etc - fails loud. See #51.
+          shopt -s nullglob
+          dirs=(*/)
+          if [ ${#dirs[@]} -eq 0 ]; then
+            echo "::error::No platform binary package directories found in $(pwd)"
+            exit 1
+          fi
+          for dir in "${dirs[@]}"; do
+            name="${dir%/}"
+            echo "Publishing ${name}"
+            set +e
+            output=$(cd "$dir" && npm publish --access public --provenance 2>&1)
+            code=$?
+            set -e
+            echo "$output"
+            if [ $code -ne 0 ]; then
+              if echo "$output" | grep -qE 'EPUBLISHCONFLICT|E409|cannot publish over|already published'; then
+                echo "::notice::Tolerating 'already published' error for ${name}"
+              else
+                exit $code
+              fi
+            fi
           done
 
       - name: Strip bundled deps and refresh platform binary optionalDependencies
@@ -133,4 +151,4 @@ jobs:
 
       - name: Publish @aictrl/cli
         working-directory: packages/cli
-        run: bun pm pack && npm publish *.tgz --access public --provenance
+        run: ${{ github.workspace }}/.github/scripts/publish-if-new.sh "@aictrl/cli"
